@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>表征学习 · 理解图谱</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="top-bar">
+    <button class="menu-toggle" id="menuToggle" aria-label="切换导航">☰</button>
+    <div class="top-bar-left">
+      <span class="top-eyebrow">Representation Learning</span>
+      <h1 class="top-title">表征学习</h1>
+    </div>
+    <div class="top-bar-right">
+      <span class="panel-label">理解图谱</span>
+      <span class="panel-value">持续演进中</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar" aria-label="章节导航">
+      <ul class="nav-tree" id="navTree"></ul>
+    </nav>
+
+    <!-- Main content -->
+    <main class="main" id="main">
+      <div class="welcome" id="welcome">
+        <h2>表征学习 · 理解图谱</h2>
+        <p class="welcome-desc">从自编码器到对比学习，从线性降维到深度非线性——一个持续演进的知识索引。</p>
+        <p class="welcome-hint">← 从左侧导航开始浏览</p>
+      </div>
+      <div class="content-area" id="contentArea" hidden></div>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    基于持续的理解沉淀 · 表征学习知识索引
+  </footer>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
