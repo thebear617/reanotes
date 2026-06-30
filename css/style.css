@@ -102,28 +102,6 @@ button {
   white-space: nowrap;
 }
 
-.top-bar-right {
-  margin-left: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0;
-  flex-shrink: 0;
-}
-
-.top-bar-right .panel-label {
-  color: rgba(255,255,255,.5);
-  font-size: .7rem;
-  font-weight: 700;
-  letter-spacing: .04em;
-}
-
-.top-bar-right .panel-value {
-  color: var(--accent-muted);
-  font-size: .82rem;
-  font-weight: 800;
-}
-
 /* ─── Layout ─── */
 
 .layout {
