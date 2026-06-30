@@ -255,8 +255,7 @@ button {
 .main {
   flex: 1;
   min-width: 0;
-  padding: 1.5rem 1.5rem 3rem;
-  max-width: 880px;
+  padding: 1.5rem 2rem 3rem;
 }
 
 /* ─── Home page ─── */
@@ -489,6 +488,7 @@ button {
 
 .page-section {
   margin-bottom: 2rem;
+  max-width: 860px;
 }
 
 .page-title {
