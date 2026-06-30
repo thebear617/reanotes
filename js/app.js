@@ -10,7 +10,37 @@
   const backdrop      = document.getElementById('sidebarBackdrop');
 
   /* ===== State ===== */
-  let activeId = null;      // currently active nav item id
+  let activeId = null;
+
+  /* ===== Navigate to a content page ===== */
+  function navigateTo(id) {
+    if (id === 'home') {
+      renderHome();
+      return;
+    }
+
+    const targetLink = document.querySelector(`.nav-item a[data-id="${id}"]`);
+    if (!targetLink) return;
+    if (id === activeId) return;
+
+    // Update active state
+    document.querySelectorAll('.nav-item a').forEach(el => el.classList.remove('active'));
+    targetLink.classList.add('active');
+
+    // Open parent category if collapsed
+    const parentUl = targetLink.closest('.nav-children');
+    if (parentUl && !parentUl.classList.contains('open')) {
+      parentUl.classList.add('open');
+      const toggle = parentUl.closest('.nav-item')?.querySelector('.nav-toggle');
+      if (toggle) toggle.classList.add('open');
+    }
+
+    activeId = id;
+    renderContent(id);
+
+    // Close sidebar on mobile
+    closeSidebar();
+  }
 
   /* ===== Render sidebar ===== */
   function renderNav() {
@@ -84,7 +114,7 @@
     e.preventDefault();
 
     const id = a.dataset.id;
-    if (id === activeId) return;
+    if (id === 'home' || id === activeId) return;
 
     // Update active state
     document.querySelectorAll('.nav-item a').forEach(el => el.classList.remove('active'));
@@ -105,7 +135,7 @@
     closeSidebar();
   }
 
-  /* ===== Render content ===== */
+  /* ===== Render content page ===== */
   function renderContent(id) {
     const data = CONTENT[id];
     if (!data) return;
@@ -113,7 +143,11 @@
     welcome.hidden = true;
     contentArea.hidden = false;
 
-    let html = `<div class="page-section"><h2 class="page-title">${data.title}</h2>`;
+    // Breadcrumb with home link
+    let html = `<div class="page-section">`;
+    html += `<div class="breadcrumb"><a href="#" class="breadcrumb-home" data-id="home">🏠 首页</a> <span class="breadcrumb-sep">/</span> <span>${data.title.replace(/^[^\s]+\s/, '') || data.title}</span></div>`;
+
+    html += `<h2 class="page-title">${data.title}</h2>`;
     if (data.desc) {
       html += `<p class="page-desc">${data.desc}</p>`;
     }
@@ -153,7 +187,6 @@
         if (isCollapsed) {
           card.classList.remove('collapsed');
           card.classList.add('open');
-          // Set max-height for animation
           const inner = body.querySelector('.card-inner');
           body.style.maxHeight = (inner ? inner.scrollHeight + 40 : 2000) + 'px';
         } else {
@@ -161,6 +194,93 @@
           card.classList.remove('open');
           body.style.maxHeight = '0';
         }
+      });
+    });
+
+    // Bind breadcrumb home click
+    const homeLink = contentArea.querySelector('.breadcrumb-home');
+    if (homeLink) {
+      homeLink.addEventListener('click', function (e) {
+        e.preventDefault();
+        navigateTo('home');
+      });
+    }
+  }
+
+  /* ===== Render home page ===== */
+  function renderHome() {
+    // Clear active state in sidebar
+    document.querySelectorAll('.nav-item a').forEach(el => el.classList.remove('active'));
+    activeId = null;
+
+    welcome.hidden = false;
+    contentArea.hidden = true;
+
+    const data = CONTENT['home'];
+    if (!data) return;
+
+    let html = '';
+
+    // Hero
+    html += `<div class="home-hero">
+      <h2 class="home-hero-title">${data.title}</h2>
+      <p class="home-hero-desc">${data.desc}</p>
+    </div>`;
+
+    // Grid cards
+    html += `<section class="home-section">
+      <h3 class="home-section-title">快速入口</h3>
+      <div class="home-grid">`;
+    data.gridCards.forEach(card => {
+      html += `<a href="#" class="home-card" data-id="${card.id}">
+        <span class="home-card-icon">${card.icon}</span>
+        <span class="home-card-title">${card.title}</span>
+        <span class="home-card-desc">${card.desc}</span>
+      </a>`;
+    });
+    html += `</div></section>`;
+
+    // Quick reference
+    html += `<section class="home-section">
+      <h3 class="home-section-title">三大范式速查</h3>
+      <div class="quickref-grid">`;
+    data.quickRef.forEach(item => {
+      html += `<div class="quickref-card">
+        <div class="quickref-label">${item.label}</div>
+        <div class="quickref-slogan">${item.slogan}</div>
+        <div class="quickref-models">${item.models}</div>
+      </div>`;
+    });
+    html += `</div></section>`;
+
+    // Recent updates
+    html += `<section class="home-section">
+      <h3 class="home-section-title">最近更新</h3>
+      <div class="updates-list">`;
+    data.recentUpdates.forEach(item => {
+      html += `<a href="#" class="updates-item" data-id="${item.id}">
+        <span class="updates-date">${item.date}</span>
+        <span class="updates-text">${item.text}</span>
+        <span class="updates-arrow">→</span>
+      </a>`;
+    });
+    html += `</div></section>`;
+
+    welcome.innerHTML = html;
+
+    // Bind grid card clicks
+    welcome.querySelectorAll('.home-card').forEach(card => {
+      card.addEventListener('click', function (e) {
+        e.preventDefault();
+        navigateTo(this.dataset.id);
+      });
+    });
+
+    // Bind updates clicks
+    welcome.querySelectorAll('.updates-item').forEach(item => {
+      item.addEventListener('click', function (e) {
+        e.preventDefault();
+        navigateTo(this.dataset.id);
       });
     });
   }
@@ -191,19 +311,35 @@
     if (e.key === 'Escape') closeSidebar();
   });
 
+  /* ===== Top bar home click ===== */
+  document.querySelector('.top-bar-left').addEventListener('click', function (e) {
+    // Click on title or eyebrow returns to home
+    const target = e.target.closest('.top-title, .top-eyebrow');
+    if (target) {
+      e.preventDefault();
+      navigateTo('home');
+    }
+  });
+
   /* ===== Init ===== */
   renderNav();
 
   // Global nav click delegation
   navTree.addEventListener('click', handleNavClick);
 
-  // If URL has hash, navigate to it
+  // If URL has hash, navigate to it; else show home
   if (window.location.hash) {
     const id = window.location.hash.slice(1);
     const targetLink = document.querySelector(`.nav-item a[data-id="${id}"]`);
     if (targetLink) {
       targetLink.click();
+    } else if (CONTENT[id]) {
+      navigateTo(id);
+    } else {
+      renderHome();
     }
+  } else {
+    renderHome();
   }
 
 })();

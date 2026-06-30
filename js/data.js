@@ -1,3 +1,29 @@
+/* ===== 首页数据 ===== */
+const HOME_GRID = [
+  { id: 'overview',         icon: '🔭', title: '总体图谱',       desc: '领域总览、三大分类轴' },
+  { id: 'self-supervised',  icon: '🔄', title: '自监督学习',     desc: '生成式 · 对比式 · 非对比式' },
+  { id: 'linear-nonlinear', icon: '⚡', title: '线性 vs 非线性', desc: '核心对照、核技巧、线性探针' },
+  { id: 'architecture',     icon: '🏗️', title: '架构范式对照',   desc: 'AE vs U-Net 设计哲学' },
+  { id: 'notes',            icon: '📝', title: '理解笔记',       desc: '关键洞察和核心速记' },
+  { id: 'supervised',       icon: '🏛️', title: '监督表示学习',   desc: 'ImageNet 预训练、线性探针' },
+  { id: 'graph',            icon: '🕸️', title: '图表示学习',     desc: 'GCN、Node2Vec、图自编码器' },
+  { id: 'metric',           icon: '📏', title: '度量学习',       desc: 'Triplet Loss、ArcFace' },
+];
+
+const HOME_UPDATES = [
+  { date: '2026-06-30', text: '创建表征学习理解图谱',          id: 'overview' },
+  { date: '2026-06-30', text: '自监督学习三大范式',            id: 'self-supervised' },
+  { date: '2026-06-30', text: '线性 vs 非线性完整对照',        id: 'linear-nonlinear' },
+  { date: '2026-06-30', text: '架构范式对照：AE vs U-Net',     id: 'architecture' },
+  { date: '2026-06-30', text: '理解笔记沉淀',                  id: 'notes' },
+];
+
+const HOME_QUICKREF = [
+  { label: '生成式',     slogan: '"把砸烂的东西恢复原样"',          models: 'AE · MAE · BERT' },
+  { label: '对比式',     slogan: '"把一样的拉近、不一样的推开"',    models: 'SimCLR · MoCo · CLIP' },
+  { label: '非对比式',   slogan: '"两个分支输出相关但不能坍塌"',    models: 'BYOL · Barlow Twins · DINO' },
+];
+
 /* ===== 导航树 ===== */
 const NAV_TREE = [
   { id: 'overview',    icon: '🔭', label: '总体图谱' },
@@ -43,6 +69,15 @@ const NAV_TREE = [
 
 /* ===== 内容数据 ===== */
 const CONTENT = {};
+
+CONTENT['home'] = {
+  type: 'home',
+  title: '表征学习 · 理解图谱',
+  desc: '从自编码器到对比学习，从线性降维到深度非线性——一个持续演进的知识索引。所有内容均可折叠展开，点击即可浏览。',
+  gridCards: HOME_GRID,
+  recentUpdates: HOME_UPDATES,
+  quickRef: HOME_QUICKREF,
+};
 
 /* ─── 总体图谱 ─── */
 CONTENT['overview'] = {
