@@ -2,49 +2,172 @@
   'use strict';
 
   /* ===== DOM refs ===== */
-  const navTree       = document.getElementById('navTree');
-  const contentArea   = document.getElementById('contentArea');
-  const welcome       = document.getElementById('welcome');
-  const sidebar       = document.getElementById('sidebar');
-  const menuToggle    = document.getElementById('menuToggle');
-  const backdrop      = document.getElementById('sidebarBackdrop');
+  const navTree      = document.getElementById('navTree');
+  const contentArea  = document.getElementById('contentArea');
+  const welcome      = document.getElementById('welcome');
+  const sidebar      = document.getElementById('sidebar');
+  const menuToggle   = document.getElementById('menuToggle');
+  const backdrop     = document.getElementById('sidebarBackdrop');
+  const switcher     = document.getElementById('boardSwitcher');
+  const topEyebrow   = document.getElementById('topEyebrow');
+  const topTitle     = document.getElementById('topTitle');
 
   /* ===== State ===== */
-  let activeId = null;
+  let currentBoard = null;   // board id, or null = 总览仪表盘
+  let activeId     = null;
 
-  /* ===== Navigate to a content page ===== */
-  function navigateTo(id) {
-    if (id === 'home') {
-      renderHome();
-      return;
+  /* ===== Helpers ===== */
+  function boardData(id) { return BOARD_DATA[id]; }
+
+  function updateTopBar(board) {
+    topEyebrow.textContent = 'reanotes';
+    topTitle.textContent = board ? board.name : '科研笔记';
+    // 高亮当前板块
+    if (switcher) {
+      switcher.querySelectorAll('.switcher-item').forEach(el => {
+        el.classList.toggle('active', board && el.dataset.board === board.id);
+      });
     }
-
-    const targetLink = document.querySelector(`.nav-item a[data-id="${id}"]`);
-    if (!targetLink) return;
-    if (id === activeId) return;
-
-    // Update active state
-    document.querySelectorAll('.nav-item a').forEach(el => el.classList.remove('active'));
-    targetLink.classList.add('active');
-
-    // Open parent category if collapsed
-    const parentUl = targetLink.closest('.nav-children');
-    if (parentUl && !parentUl.classList.contains('open')) {
-      parentUl.classList.add('open');
-      const toggle = parentUl.closest('.nav-item')?.querySelector('.nav-toggle');
-      if (toggle) toggle.classList.add('open');
-    }
-
-    activeId = id;
-    renderContent(id);
-
-    // Close sidebar on mobile
-    closeSidebar();
   }
 
-  /* ===== Render sidebar ===== */
-  function renderNav() {
-    NAV_TREE.forEach(item => {
+  /* ===== 路由（hash 驱动） ===== */
+  function parseHash() {
+    const raw = (window.location.hash || '').replace(/^#/, '');
+    if (!raw) return { board: null, page: null };
+    const parts = raw.split('/');
+    if (parts.length >= 2) return { board: parts[0], page: parts[1] };
+    if (BOARD_DATA[parts[0]]) return { board: parts[0], page: null };
+    return { board: currentBoard, page: parts[0] };
+  }
+
+  function route() {
+    const { board, page } = parseHash();
+    if (!board || !BOARD_DATA[board]) { renderDashboard(); return; }
+    if (currentBoard !== board) enterBoard(board);
+    if (page && BOARD_DATA[board].content[page]) {
+      renderContentPage(page);
+    } else {
+      renderBoardHome(board);
+    }
+  }
+
+  /* ===== 总览仪表盘 ===== */
+  function renderDashboard() {
+    currentBoard = null;
+    activeId = null;
+    document.querySelectorAll('.nav-item a').forEach(el => el.classList.remove('active'));
+    navTree.innerHTML = '';
+    welcome.hidden = false;
+    contentArea.hidden = true;
+    updateTopBar(null);
+
+    let html = `<div class="dash">
+      <div class="dash-hero">
+        <h2 class="dash-title">reanotes · 科研笔记总站</h2>
+        <p class="dash-desc">个人科研笔记的知识索引。选择一个板块开始浏览，所有内容均可折叠展开。</p>
+      </div>
+      <div class="dash-grid">`;
+    BOARDS.forEach(b => {
+      html += `<a href="#${b.id}" class="dash-card" data-board="${b.id}" style="--accent:${b.accent}">
+        <span class="dash-card-icon">${b.icon}</span>
+        <span class="dash-card-name">${b.name}</span>
+        <span class="dash-card-desc">${b.desc}</span>
+      </a>`;
+    });
+    html += `</div></div>`;
+    welcome.innerHTML = html;
+
+    welcome.querySelectorAll('.dash-card').forEach(card => {
+      card.addEventListener('click', function (e) {
+        e.preventDefault();
+        window.location.hash = card.dataset.board;
+      });
+    });
+  }
+
+  /* ===== 进入某板块（仅搭好骨架，不渲染内容） ===== */
+  function enterBoard(id) {
+    const data = boardData(id);
+    if (!data) return;
+    currentBoard = id;
+    const board = BOARDS.find(b => b.id === id);
+    renderNav(data.navTree);
+    updateTopBar(board);
+  }
+
+  /* ===== 板块首页 ===== */
+  function renderBoardHome(id) {
+    const data = boardData(id);
+    if (!data) return;
+    if (currentBoard !== id) enterBoard(id);
+    activeId = null;
+    document.querySelectorAll('.nav-item a').forEach(el => el.classList.remove('active'));
+    welcome.hidden = false;
+    contentArea.hidden = true;
+
+    const home = data.home || {};
+    let html = '';
+    html += `<div class="home-hero">
+      <h2 class="home-hero-title">${home.title || ''}</h2>
+      <p class="home-hero-desc">${home.desc || ''}</p>
+    </div>`;
+
+    if (home.gridCards && home.gridCards.length) {
+      html += `<section class="home-section">
+        <h3 class="home-section-title">快速入口</h3>
+        <div class="home-grid">`;
+      home.gridCards.forEach(card => {
+        html += `<a href="#${id}/${card.id}" class="home-card" data-page="${card.id}">
+          <span class="home-card-icon">${card.icon}</span>
+          <span class="home-card-title">${card.title}</span>
+          <span class="home-card-desc">${card.desc}</span>
+        </a>`;
+      });
+      html += `</div></section>`;
+    }
+
+    if (home.quickRef && home.quickRef.length) {
+      html += `<section class="home-section">
+        <h3 class="home-section-title">速查</h3>
+        <div class="quickref-grid">`;
+      home.quickRef.forEach(item => {
+        html += `<div class="quickref-card">
+          <div class="quickref-label">${item.label}</div>
+          <div class="quickref-slogan">${item.slogan}</div>
+          <div class="quickref-models">${item.models}</div>
+        </div>`;
+      });
+      html += `</div></section>`;
+    }
+
+    if (home.recentUpdates && home.recentUpdates.length) {
+      html += `<section class="home-section">
+        <h3 class="home-section-title">最近更新</h3>
+        <div class="updates-list">`;
+      home.recentUpdates.forEach(item => {
+        html += `<a href="#${id}/${item.id}" class="updates-item" data-page="${item.id}">
+          <span class="updates-date">${item.date}</span>
+          <span class="updates-text">${item.text}</span>
+          <span class="updates-arrow">→</span>
+        </a>`;
+      });
+      html += `</div></section>`;
+    }
+
+    welcome.innerHTML = html;
+
+    welcome.querySelectorAll('.home-card, .updates-item').forEach(el => {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        window.location.hash = id + '/' + this.dataset.page;
+      });
+    });
+  }
+
+  /* ===== 侧边栏 ===== */
+  function renderNav(navTreeData) {
+    navTree.innerHTML = '';
+    navTreeData.forEach(item => {
       if (item.type === 'divider') {
         const div = document.createElement('li');
         div.className = 'nav-divider';
@@ -53,7 +176,6 @@
       }
 
       if (item.children) {
-        // Category node with children
         const li = document.createElement('li');
         li.className = 'nav-item';
         const toggle = document.createElement('button');
@@ -82,16 +204,13 @@
         li.appendChild(ul);
         navTree.appendChild(li);
 
-        // Toggle expand
         toggle.addEventListener('click', function (e) {
           e.stopPropagation();
           const targetUl = document.getElementById('child-' + this.dataset.target);
           const isOpen = targetUl.classList.toggle('open');
           this.classList.toggle('open', isOpen);
         });
-
       } else {
-        // Leaf node
         const li = document.createElement('li');
         li.className = 'nav-item';
         const a = document.createElement('a');
@@ -107,54 +226,37 @@
     });
   }
 
-  /* ===== Click handler: nav link ===== */
-  function handleNavClick(e) {
-    const a = e.target.closest('a[data-id]');
-    if (!a) return;
-    e.preventDefault();
-
-    const id = a.dataset.id;
-    if (id === 'home' || id === activeId) return;
-
-    // Update active state
-    document.querySelectorAll('.nav-item a').forEach(el => el.classList.remove('active'));
-    a.classList.add('active');
-
-    // Open parent category if collapsed
-    const parentUl = a.closest('.nav-children');
-    if (parentUl && !parentUl.classList.contains('open')) {
-      parentUl.classList.add('open');
-      const toggle = parentUl.closest('.nav-item')?.querySelector('.nav-toggle');
-      if (toggle) toggle.classList.add('open');
-    }
-
-    activeId = id;
-    renderContent(id);
-
-    // Close sidebar on mobile
-    closeSidebar();
-  }
-
-  /* ===== Render content page ===== */
-  function renderContent(id) {
-    const data = CONTENT[id];
+  /* ===== 内容页 ===== */
+  function renderContentPage(id) {
+    const data = boardData(currentBoard);
     if (!data) return;
+    const page = data.content[id];
+    if (!page) return;
 
+    // 侧栏高亮 + 展开父分类
+    document.querySelectorAll('.nav-item a').forEach(el => el.classList.remove('active'));
+    const link = document.querySelector(`.nav-item a[data-id="${id}"]`);
+    if (link) {
+      link.classList.add('active');
+      const parentUl = link.closest('.nav-children');
+      if (parentUl && !parentUl.classList.contains('open')) {
+        parentUl.classList.add('open');
+        const toggle = parentUl.closest('.nav-item')?.querySelector('.nav-toggle');
+        if (toggle) toggle.classList.add('open');
+      }
+    }
+    activeId = id;
     welcome.hidden = true;
     contentArea.hidden = false;
 
-    // Breadcrumb with home link
     let html = `<div class="page-section">`;
-    html += `<div class="breadcrumb"><a href="#" class="breadcrumb-home" data-id="home">🏠 首页</a> <span class="breadcrumb-sep">/</span> <span>${data.title.replace(/^[^\s]+\s/, '') || data.title}</span></div>`;
+    html += `<div class="breadcrumb"><a href="#${currentBoard}" class="breadcrumb-home">🏠 首页</a> <span class="breadcrumb-sep">/</span> <span>${page.title.replace(/^[^\s]+\s/, '') || page.title}</span></div>`;
+    html += `<h2 class="page-title">${page.title}</h2>`;
+    if (page.desc) html += `<p class="page-desc">${page.desc}</p>`;
 
-    html += `<h2 class="page-title">${data.title}</h2>`;
-    if (data.desc) {
-      html += `<p class="page-desc">${data.desc}</p>`;
-    }
-
-    if (data.cards) {
+    if (page.cards) {
       html += '<div class="card-group">';
-      data.cards.forEach((card, idx) => {
+      page.cards.forEach((card, idx) => {
         const cardId = 'card-' + id + '-' + idx;
         const collapsed = card.expanded ? '' : 'collapsed';
         html += `
@@ -172,18 +274,16 @@
       });
       html += '</div>';
     }
-
     html += '</div>';
     contentArea.innerHTML = html;
 
-    // Re-bind card toggle events
+    // 卡片折叠
     document.querySelectorAll('.card-header').forEach(header => {
       header.addEventListener('click', function () {
         const card = document.getElementById(this.dataset.card);
         if (!card) return;
         const body = card.querySelector('.card-body');
         const isCollapsed = card.classList.contains('collapsed');
-
         if (isCollapsed) {
           card.classList.remove('collapsed');
           card.classList.add('open');
@@ -197,149 +297,75 @@
       });
     });
 
-    // Bind breadcrumb home click
+    // 面包屑首页 → 板块首页
     const homeLink = contentArea.querySelector('.breadcrumb-home');
     if (homeLink) {
       homeLink.addEventListener('click', function (e) {
         e.preventDefault();
-        navigateTo('home');
+        window.location.hash = currentBoard;
       });
     }
+
+    closeSidebar();
   }
 
-  /* ===== Render home page ===== */
-  function renderHome() {
-    // Clear active state in sidebar
-    document.querySelectorAll('.nav-item a').forEach(el => el.classList.remove('active'));
-    activeId = null;
+  /* ===== 板块切换器 ===== */
+  function renderBoardSwitcher() {
+    if (!switcher) return;
+    switcher.innerHTML = '';
+    const overview = document.createElement('a');
+    overview.href = '#';
+    overview.className = 'switcher-item switcher-overview';
+    overview.dataset.board = '';
+    overview.textContent = '☰ 总览';
+    switcher.appendChild(overview);
 
-    welcome.hidden = false;
-    contentArea.hidden = true;
-
-    const data = CONTENT['home'];
-    if (!data) return;
-
-    let html = '';
-
-    // Hero
-    html += `<div class="home-hero">
-      <h2 class="home-hero-title">${data.title}</h2>
-      <p class="home-hero-desc">${data.desc}</p>
-    </div>`;
-
-    // Grid cards
-    html += `<section class="home-section">
-      <h3 class="home-section-title">快速入口</h3>
-      <div class="home-grid">`;
-    data.gridCards.forEach(card => {
-      html += `<a href="#" class="home-card" data-id="${card.id}">
-        <span class="home-card-icon">${card.icon}</span>
-        <span class="home-card-title">${card.title}</span>
-        <span class="home-card-desc">${card.desc}</span>
-      </a>`;
+    BOARDS.forEach(b => {
+      const a = document.createElement('a');
+      a.href = '#' + b.id;
+      a.className = 'switcher-item';
+      a.dataset.board = b.id;
+      a.style.setProperty('--accent', b.accent);
+      a.innerHTML = `<span class="switcher-icon">${b.icon}</span><span>${b.name}</span>`;
+      switcher.appendChild(a);
     });
-    html += `</div></section>`;
 
-    // Quick reference
-    html += `<section class="home-section">
-      <h3 class="home-section-title">三大范式速查</h3>
-      <div class="quickref-grid">`;
-    data.quickRef.forEach(item => {
-      html += `<div class="quickref-card">
-        <div class="quickref-label">${item.label}</div>
-        <div class="quickref-slogan">${item.slogan}</div>
-        <div class="quickref-models">${item.models}</div>
-      </div>`;
-    });
-    html += `</div></section>`;
-
-    // Recent updates
-    html += `<section class="home-section">
-      <h3 class="home-section-title">最近更新</h3>
-      <div class="updates-list">`;
-    data.recentUpdates.forEach(item => {
-      html += `<a href="#" class="updates-item" data-id="${item.id}">
-        <span class="updates-date">${item.date}</span>
-        <span class="updates-text">${item.text}</span>
-        <span class="updates-arrow">→</span>
-      </a>`;
-    });
-    html += `</div></section>`;
-
-    welcome.innerHTML = html;
-
-    // Bind grid card clicks
-    welcome.querySelectorAll('.home-card').forEach(card => {
-      card.addEventListener('click', function (e) {
+    switcher.querySelectorAll('.switcher-item').forEach(el => {
+      el.addEventListener('click', function (e) {
         e.preventDefault();
-        navigateTo(this.dataset.id);
-      });
-    });
-
-    // Bind updates clicks
-    welcome.querySelectorAll('.updates-item').forEach(item => {
-      item.addEventListener('click', function (e) {
-        e.preventDefault();
-        navigateTo(this.dataset.id);
+        window.location.hash = this.dataset.board;  // '' => 总览
       });
     });
   }
 
   /* ===== Sidebar open/close ===== */
-  function openSidebar() {
-    sidebar.classList.add('open');
-    backdrop.hidden = false;
-  }
-
-  function closeSidebar() {
-    sidebar.classList.remove('open');
-    backdrop.hidden = true;
-  }
+  function openSidebar() { sidebar.classList.add('open'); backdrop.hidden = false; }
+  function closeSidebar() { sidebar.classList.remove('open'); backdrop.hidden = true; }
 
   menuToggle.addEventListener('click', function () {
-    if (sidebar.classList.contains('open')) {
-      closeSidebar();
-    } else {
-      openSidebar();
-    }
+    if (sidebar.classList.contains('open')) closeSidebar(); else openSidebar();
   });
-
   backdrop.addEventListener('click', closeSidebar);
-
-  /* ===== Keyboard escape ===== */
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closeSidebar();
   });
 
-  /* ===== Top bar home click ===== */
+  /* ===== 顶栏点击：eyebrow→总览，title→板块首页 ===== */
   document.querySelector('.top-bar-left').addEventListener('click', function (e) {
-    // Click on title or eyebrow returns to home
     const target = e.target.closest('.top-title, .top-eyebrow');
-    if (target) {
-      e.preventDefault();
-      navigateTo('home');
+    if (!target) return;
+    e.preventDefault();
+    if (target.classList.contains('top-eyebrow')) {
+      window.location.hash = '';
+    } else if (currentBoard) {
+      window.location.hash = currentBoard;
+    } else {
+      window.location.hash = '';
     }
   });
 
   /* ===== Init ===== */
-  renderNav();
-
-  // Global nav click delegation
-  navTree.addEventListener('click', handleNavClick);
-
-  // If URL has hash, navigate to it; else show home
-  if (window.location.hash) {
-    const id = window.location.hash.slice(1);
-    const targetLink = document.querySelector(`.nav-item a[data-id="${id}"]`);
-    if (targetLink) {
-      targetLink.click();
-    } else if (CONTENT[id]) {
-      navigateTo(id);
-    } else {
-      renderHome();
-    }
-  } else {
-    renderHome();
-  }
-
+  renderBoardSwitcher();
+  window.addEventListener('hashchange', route);
+  route();
 })();

@@ -758,3 +758,15 @@ CONTENT['notes'] = {
     },
   ]
 };
+
+/* ===== 包装为板块数据（reanotes 多板块架构） ===== */
+window.BOARD_DATA = window.BOARD_DATA || {};
+(function () {
+  var content = Object.assign({}, CONTENT);
+  delete content.home;
+  BOARD_DATA['replearning'] = {
+    home: CONTENT['home'],
+    navTree: NAV_TREE,
+    content: content,
+  };
+})();

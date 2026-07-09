@@ -1,92 +1,71 @@
-# 表征学习 · 理解图谱
+# reanotes · 科研笔记总站
 
-> Representation Learning — 从自编码器到对比学习，从线性降维到深度非线性，一个持续演进的知识索引。
+> 个人科研笔记的知识索引。表征学习只是其中一个板块，可容纳任意多个研究板块。
 
-在线地址：https://thebear617.github.io/representation-learning/
+在线地址：https://thebear617.github.io/reanotes/
 
 ## 这是什么？
 
-这是一个**个人知识图谱式的理解中心**，用于沉淀对表示学习（Representation Learning）的理解。它不是教科书式的全面综述，而是带着个人思考脉络的知识索引——把理解组织成可浏览、可演进、可持续添加的结构。
+这是一个**多板块的个人科研笔记站**。首页是板块总览仪表盘，每个板块是一块独立的知识域（例如「表征学习」），内部用可折叠的卡片组织理解脉络。新增研究主题 = 新增一个板块，零侵入。
 
 ## 信息架构
 
-左侧导航从五个视角组织内容：
+```
+reanotes 首页（板块总览仪表盘）
+├── 🧠 表征学习   (replearning)   ← 现有全部表征学习内容整体迁入
+├── 📚 板块二      (待添加)
+├── 🔬 板块三      (待添加)
+└── …… 后续任意新增
+```
 
-| 视角 | 内容 |
-|------|------|
-| 🔭 总体图谱 | 领域总览、三大分类轴 |
-| 📐 按监督信号 | 监督 / 自监督（生成式·对比式·非对比式） / 无监督 / 弱监督 |
-| 🧬 按表示属性 | 解耦 / 稀疏 / 分层表示学习 |
-| 📦 按数据形态 | 图 / 多模态 / 序列表示学习 |
-| 🎯 按学习目标 | 度量学习 / 迁移学习 / 多任务学习 |
-| ⚡ 线性 vs 非线性 | 核心对照、核技巧、线性探针 |
-| 🏗️ 架构范式对照 | AE vs U-Net：编码器-解码器家族的两种设计哲学 |
-| 📝 理解笔记 | 阅读和讨论中沉淀的核心洞察 |
+- **首页（总览）**：列出所有板块卡片，点击进入
+- **进入某板块后**：顶栏板块切换器可一点换板块；左侧是该板块自己的导航；面包屑「🏠 首页」回到该板块首页；点顶栏站名「reanotes」回到总览
+- **路由**：用 URL hash，`#replearning` 进板块首页，`#replearning/self-supervised` 直接定位某页，空 hash 为总览
 
 ## 文件结构
 
 ```
-├── index.html          # 页面入口
+├── index.html              # 页面入口（标题、顶栏、板块切换器容器）
 ├── css/
-│   └── style.css       # 所有样式（靛青色系 + 侧边栏布局）
+│   └── style.css           # 所有样式（靛青色系 + 侧边栏布局 + 仪表盘/切换器）
 └── js/
-    ├── data.js         # 内容数据层：导航树 + 各页面卡片内容
-    └── app.js          # 渲染引擎：侧边栏、卡片折叠、响应式
+    ├── boards-index.js     # 板块索引 BOARDS：决定有哪些板块、顺序、配色
+    ├── boards/
+    │   └── replearning.js  # 表征学习板块数据（home / navTree / content）
+    └── app.js              # 渲染引擎：总览、板块切换、侧栏、卡片折叠、响应式
 ```
 
 ## 如何添加新内容
 
-所有内容集中在 `js/data.js`：
+### 在已有板块里加页面
 
-### 添加新分类（导航侧边栏）
+所有内容在对应板块的 `js/boards/<boardId>.js`：
 
-在 `NAV_TREE` 数组中追加：
+1. 在 `navTree` 数组加入口（叶节点 `{id, icon, label}` 或带 `children` 的父节点；也可用 `{type: 'divider'}` 分隔条）
+2. 在 `content` 对象加对应页面（`title` / `desc` / `cards` 数组）
+3. 卡片 schema：`{icon, title, tags, expanded, body}`，`body` 是 HTML
+4. 首页 `HOME_GRID` / `HOME_UPDATES` / `HOME_QUICKREF` 是板块首页的独立列表
 
-```js
-{ id: 'my-new-topic', icon: '🌟', label: '我的新主题' },
+### 新增一个研究板块
 
-// 如果是带子项的分类：
-{
-  id: 'cat-my-topic', icon: '🌟', label: '主题分类',
-  children: [
-    { id: 'sub-topic-1', label: '子主题1' },
-    { id: 'sub-topic-2', label: '子主题2' },
-  ]
-}
-```
-
-### 添加新卡片内容
-
-在 `CONTENT` 对象中追加：
-
-```js
-CONTENT['my-new-topic'] = {
-  title: '🌟 我的新主题',
-  desc: '一段概述……',
-  cards: [
-    {
-      icon: '💡',
-      title: '卡片标题',
-      tags: ['标签1', '标签2'],
-      expanded: false,      // true = 默认展开
-      body: `<p>内容……</p>`  // 支持 HTML
-    },
-  ]
-};
-```
-
-添加后刷新页面即可看到效果，无需任何构建步骤。
+1. 复制 `js/boards/replearning.js` 为 `js/boards/<boardId>.js`，把里面 `BOARD_DATA['replearning']` 改为 `BOARD_DATA['<boardId>']`，替换 `home` / `navTree` / `content`
+2. 在 `js/boards-index.js` 的 `BOARDS` 数组加一行：
+   ```js
+   { id: 'topic-xxx', name: '板块二', icon: '🔬', desc: '一句话描述', accent: '#0f6e56' },
+   ```
+3. 在 `index.html` 里 `<script src="js/boards/replearning.js"></script>` 下方加一行 `<script src="js/boards/<boardId>.js"></script>`
+4. 刷新即可，无需构建
 
 ## 设计语言
 
-- **主色调**：深蓝灰（`#0f172a`）+ 靛青（`#4f46e5`），与温暖的猫猫/租房/猪窝系列形成视觉区分
-- **布局**：左侧固定导航 + 右侧内容区，知识库风格
+- **主色调**：深蓝灰（`#0f172a`）+ 靛青（`#4f46e5`），各板块可用 `accent` 自定义点缀色
+- **布局**：顶栏板块切换器 + 左侧固定导航 + 右侧内容区，知识库风格
 - **卡片系统**：可折叠展开，适合层次化阅读
 - **响应式**：窄屏时侧边栏转为滑出 + 遮罩
 
 ## 部署
 
-本仓库通过 GitHub Pages 部署。推送到 `main` 分支后自动构建。
+本仓库通过 GitHub Pages 部署（仓库名 `reanotes`）。推送到 `main` 分支后自动构建。
 
 ```bash
 git push origin main
