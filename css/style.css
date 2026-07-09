@@ -754,28 +754,54 @@ button {
   margin: 1.5rem 0;
 }
 
+/* ─── 总览页：隐藏侧边栏，内容居中 ─── */
+
+.on-dashboard .sidebar {
+  display: none;
+}
+
+.on-dashboard .menu-toggle {
+  display: none;
+}
+
 /* ─── Board Dashboard (总览) ─── */
 
 .dash {
+  max-width: 980px;
+  margin: 0 auto;
   animation: fadeIn .25s ease;
 }
 
 .dash-hero {
   text-align: center;
-  padding: 2.5rem 1rem 1.5rem;
+  padding: 3.5rem 1rem 2rem;
+}
+
+.dash-eyebrow {
+  display: inline-block;
+  font-size: .74rem;
+  font-weight: 800;
+  letter-spacing: .22em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: .65rem;
 }
 
 .dash-title {
-  font-size: 1.9rem;
+  font-size: 2.1rem;
   font-weight: 900;
-  color: var(--dark);
   letter-spacing: .02em;
+  background: linear-gradient(120deg, var(--dark) 25%, var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--dark);   /* 回退色 */
 }
 
 .dash-desc {
-  margin-top: .7rem;
+  margin-top: .8rem;
   color: var(--muted);
-  font-size: .95rem;
+  font-size: .98rem;
   line-height: 1.7;
   max-width: 540px;
   margin-left: auto;
@@ -783,47 +809,66 @@ button {
 }
 
 .dash-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: .9rem;
-  margin-top: 1.2rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
 
 .dash-card {
   display: flex;
   flex-direction: column;
-  gap: .35rem;
-  padding: 1.3rem 1.2rem;
+  gap: .4rem;
+  flex: 1 1 260px;
+  max-width: 300px;
+  padding: 1.4rem 1.3rem;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
   box-shadow: var(--shadow);
   text-decoration: none;
   border-top: 3px solid var(--accent, #4f46e5);
-  transition: border-color .15s, transform .15s, box-shadow .15s;
+  transition: transform .15s, box-shadow .15s, border-color .15s;
 }
 
 .dash-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 26px rgba(15,23,42,.12);
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(15,23,42,.14);
+  border-color: var(--accent);
 }
 
 .dash-card-icon {
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   line-height: 1;
 }
 
 .dash-card-name {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 900;
   color: var(--text);
 }
 
 .dash-card-desc {
-  font-size: .82rem;
+  font-size: .84rem;
   color: var(--muted);
-  line-height: 1.5;
+  line-height: 1.55;
   font-weight: 500;
+}
+
+.dash-card-go {
+  margin-top: .35rem;
+  font-size: .8rem;
+  font-weight: 800;
+  color: var(--accent);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity .15s, transform .15s;
+}
+
+.dash-card:hover .dash-card-go {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 /* ─── Sidebar backdrop (mobile) ─── */

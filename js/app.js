@@ -55,6 +55,8 @@
   function renderDashboard() {
     currentBoard = null;
     activeId = null;
+    document.body.classList.add('on-dashboard');   // 隐藏侧边栏，内容居中
+    closeSidebar();
     document.querySelectorAll('.nav-item a').forEach(el => el.classList.remove('active'));
     navTree.innerHTML = '';
     welcome.hidden = false;
@@ -63,8 +65,9 @@
 
     let html = `<div class="dash">
       <div class="dash-hero">
-        <h2 class="dash-title">reanotes · 科研笔记总站</h2>
-        <p class="dash-desc">个人科研笔记的知识索引。选择一个板块开始浏览，所有内容均可折叠展开。</p>
+        <span class="dash-eyebrow">REANOTES</span>
+        <h2 class="dash-title">科研笔记总站</h2>
+        <p class="dash-desc">个人科研笔记的知识索引。从下方选择一个板块，或直接用顶栏切换器开始浏览。</p>
       </div>
       <div class="dash-grid">`;
     BOARDS.forEach(b => {
@@ -72,6 +75,7 @@
         <span class="dash-card-icon">${b.icon}</span>
         <span class="dash-card-name">${b.name}</span>
         <span class="dash-card-desc">${b.desc}</span>
+        <span class="dash-card-go">进入浏览 →</span>
       </a>`;
     });
     html += `</div></div>`;
@@ -90,6 +94,7 @@
     const data = boardData(id);
     if (!data) return;
     currentBoard = id;
+    document.body.classList.remove('on-dashboard');   // 进入板块：恢复侧边栏
     const board = BOARDS.find(b => b.id === id);
     renderNav(data.navTree);
     updateTopBar(board);
