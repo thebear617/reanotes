@@ -2,7 +2,7 @@
 
 > 个人科研笔记的知识索引。表征学习只是其中一个板块，可容纳任意多个研究板块。
 
-在线地址：https://thebear617.github.io/reanotes/
+在线地址：http://rea.thebear617.cn/ （GitHub Pages 备用：https://thebear617.github.io/reanotes/）
 
 ## 这是什么？
 
@@ -65,7 +65,9 @@ reanotes 首页（板块总览仪表盘）
 
 ## 部署
 
-本仓库通过 GitHub Pages 部署（仓库名 `reanotes`）。推送到 `main` 分支后自动构建。
+本仓库**双托管**：
+- **GitHub Pages**：仓库名 `reanotes`，`git push origin main` 后自动构建，地址 `https://thebear617.github.io/reanotes/`。
+- **Vercel（自定义域名 `rea.thebear617.cn`）**：在 Vercel 导入 `thebear617/reanotes` 仓库并绑定该域名（DNS 已指向 Vercel），随 `main` 自动部署。
 
 ```bash
 git push origin main

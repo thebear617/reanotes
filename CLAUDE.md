@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 项目性质
 
 纯静态站点：HTML + CSS + 原生 JavaScript，**无构建步骤、无依赖、无测试、无 linter**。
-部署在 GitHub Pages（`https://thebear617.github.io/reanotes/`），推送到 `main` 自动发布。
+双托管：GitHub Pages（`https://thebear617.github.io/reanotes/`）作为源与备用；自定义域名 `http://rea.thebear617.cn/` 由 **Vercel** 托管（DNS 指向 Vercel，与 `thebear617.cn` 其余子域一致）。推送到 `main` 后两者均自动部署。
 **多板块**结构：表征学习只是其中一个板块，站点可容纳任意多个研究板块。
 
 ## 运行方式
