@@ -203,6 +203,10 @@
           a.href = '#';
           a.dataset.id = child.id;
           a.textContent = child.label;
+          a.addEventListener('click', function (e) {
+            e.preventDefault();
+            window.location.hash = currentBoard + '/' + child.id;
+          });
           childLi.appendChild(a);
           ul.appendChild(childLi);
         });
@@ -225,6 +229,10 @@
           <span class="nav-icon">${item.icon || ''}</span>
           <span class="nav-label">${item.label}</span>
         `;
+        a.addEventListener('click', function (e) {
+          e.preventDefault();
+          window.location.hash = currentBoard + '/' + item.id;
+        });
         li.appendChild(a);
         navTree.appendChild(li);
       }

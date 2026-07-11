@@ -1,5 +1,7 @@
+(function () {
 /* ===== 首页数据 ===== */
 const HOME_GRID = [
+  { id: 'foundation',       icon: '📜', title: '理论基底',       desc: 'Bengio 定义与十大先验' },
   { id: 'overview',         icon: '🔭', title: '总体图谱',       desc: '领域总览、三大分类轴' },
   { id: 'self-supervised',  icon: '🔄', title: '自监督学习',     desc: '生成式 · 对比式 · 非对比式' },
   { id: 'linear-nonlinear', icon: '⚡', title: '线性 vs 非线性', desc: '核心对照、核技巧、线性探针' },
@@ -11,6 +13,7 @@ const HOME_GRID = [
 ];
 
 const HOME_UPDATES = [
+  { date: '2026-07-11', text: '新增理论基底：Bengio 定义与十大先验', id: 'foundation' },
   { date: '2026-06-30', text: '创建表征学习理解图谱',          id: 'overview' },
   { date: '2026-06-30', text: '自监督学习三大范式',            id: 'self-supervised' },
   { date: '2026-06-30', text: '线性 vs 非线性完整对照',        id: 'linear-nonlinear' },
@@ -26,6 +29,7 @@ const HOME_QUICKREF = [
 
 /* ===== 导航树 ===== */
 const NAV_TREE = [
+  { id: 'foundation',  icon: '📜', label: '理论基底' },
   { id: 'overview',    icon: '🔭', label: '总体图谱' },
   { id: 'div1',        type: 'divider' },
   {
@@ -759,6 +763,62 @@ CONTENT['notes'] = {
   ]
 };
 
+/* ─── 理论基底 ─── */
+CONTENT['foundation'] = {
+  title: '📜 理论基底',
+  desc: '表征学习为什么重要、Bengio 如何定义它、以及支撑整个领域的十大先验（prior）。这是后续所有分类轴的"元框架"。',
+  cards: [
+    {
+      icon: '🤔',
+      title: '为什么要表征学习？',
+      tags: ['动机'],
+      expanded: true,
+      body: `<p>机器学习的成败，不仅取决于算法，也取决于<strong>数据的表示（representation）</strong>。表示选得好，有效信息被暴露；选得差，有效信息被隐藏。</p>
+      <ul class="nested-list">
+        <li><strong>特征工程</strong>：靠人工经验设计特征——数据量小、先验明确时高效</li>
+        <li><strong>表征学习</strong>：让算法自动从大量复杂数据中提取特征——数据量大且复杂时必需</li>
+      </ul>
+      <p>一个核心动机：人类只需<strong>少量样本</strong>就能区分猫狗，机器却要海量数据。差异在于<strong>大脑如何对数据编码、如何存储知识</strong>——这正是表征学习想破解的目标。</p>
+      <p>2013 年第一届 ICLR，Bengio 与 LeCun 创办会议，主张"机器学习效果高度依赖数据表示的选择"；同年 Bengio 发表表征学习综述 <em>Representation Learning: A Review and New Perspectives</em>。</p>`
+    },
+    {
+      icon: '📐',
+      title: 'Bengio 的定义',
+      tags: ['定义'],
+      expanded: true,
+      body: `<blockquote style="border-left:3px solid var(--accent);padding:.5rem 1rem;color:var(--muted);background:var(--accent-bg);border-radius:0 8px 8px 0;margin:.4rem 0;font-style:italic">
+        learning representations of the data that make it easier to extract useful information when building classifiers or other predictors
+      </blockquote>
+      <p>两点关键推论：</p>
+      <ul class="nested-list">
+        <li><strong>表征不能孤立评价</strong>：一个表征"好不好"，必须结合最终下游任务（分类/回归/检测）来看——隔了分类器，难以客观度量。</li>
+        <li><strong>目标是解耦解释因子</strong>：Bengio 指出，好的表征应当"识别并解耦隐藏在低层感知数据背后的底层解释性因子（explanatory factors）"。</li>
+      </ul>`
+    },
+    {
+      icon: '🧬',
+      title: '十大先验（Bengio 的 priors）',
+      tags: ['框架', '总纲'],
+      expanded: true,
+      body: `<p>为获得好表征，建模时应嵌入一些对多目标通用的<strong>先验知识</strong>。Bengio 列出如下（"站点对应"指向本知识库已有页面）：</p>
+      <table class="comp-table">
+        <tr><th>#</th><th>先验</th><th>一句话含义</th><th>站点对应</th></tr>
+        <tr><td>01</td><td>Smoothness</td><td>输入相近 → 表征相近（x≈y ⇒ f(x)≈f(y)）</td><td>—（基础假设）</td></tr>
+        <tr><td>02</td><td>Multiple explanatory factors</td><td>数据由多个解释因子决定，应尽量<strong>解耦</strong></td><td><a href="#replearning/disentangled">解耦表示</a></td></tr>
+        <tr><td>03</td><td>Hierarchical organization</td><td>越抽象的概念位于越高层</td><td><a href="#replearning/hierarchical">分层表示</a></td></tr>
+        <tr><td>04</td><td>Semi-supervised learning</td><td>表征在无监督/有监督间共享统计优势</td><td><a href="#replearning/semi-supervised">半监督</a></td></tr>
+        <tr><td>05</td><td>Shared factors across tasks</td><td>同一表征跨任务有效（多任务/迁移/域适应）</td><td><a href="#replearning/transfer">迁移</a> · <a href="#replearning/multitask">多任务</a></td></tr>
+        <tr><td>06</td><td>Manifolds</td><td>表征落在高维空间的低维流形上</td><td><a href="#replearning/unsupervised">无监督（AE/流形）</a></td></tr>
+        <tr><td>07</td><td>Natural clustering</td><td>不同类分布在分散流形，类间插值处于低密度区</td><td>—（聚类视角）</td></tr>
+        <tr><td>08</td><td>Temporal / spatial coherence</td><td>序列连续或空间相邻的样本在流形上仅微变</td><td><a href="#replearning/sequence">序列表示</a></td></tr>
+        <tr><td>09</td><td>Sparsity</td><td>多数特征接近 0，鲁棒且可解释</td><td><a href="#replearning/sparse">稀疏表示</a></td></tr>
+        <tr><td>10</td><td>Simplicity of factor dependencies</td><td>高层表征因子依赖应简单（典型线性，如物理定律）</td><td><a href="#replearning/linear-nonlinear">线性 vs 非线性</a></td></tr>
+      </table>
+      <p>注：如何把这些先验<strong>形式化为可优化的评价准则</strong>，至今仍是开放问题——这也是表征学习最核心的研究动机之一。</p>`
+    },
+  ]
+};
+
 /* ===== 包装为板块数据（reanotes 多板块架构） ===== */
 window.BOARD_DATA = window.BOARD_DATA || {};
 (function () {
@@ -769,4 +829,5 @@ window.BOARD_DATA = window.BOARD_DATA || {};
     navTree: NAV_TREE,
     content: content,
   };
+})();
 })();

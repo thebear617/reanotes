@@ -616,6 +616,96 @@ button {
   margin-top: 0;
 }
 
+/* ── card-inner 内联排版 ── */
+
+.card-inner ol,
+.card-inner ul {
+  margin-top: .6rem;
+  padding-left: 1.6em;
+  color: #33302d;
+  font-size: .9rem;
+  line-height: 1.7;
+  max-width: 720px;
+}
+
+.card-inner li {
+  margin-bottom: .2em;
+}
+
+.card-inner li:last-child {
+  margin-bottom: 0;
+}
+
+.card-inner strong {
+  font-weight: 700;
+  color: #1a1816;
+}
+
+.card-inner a {
+  color: #4f46e5;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color .15s;
+}
+
+.card-inner a:hover {
+  border-bottom-color: #4f46e5;
+}
+
+.card-inner table {
+  width: 100%;
+  max-width: 720px;
+  margin-top: .6rem;
+  border-collapse: collapse;
+  font-size: .85rem;
+}
+
+.card-inner th,
+.card-inner td {
+  padding: .4em .7em;
+  border: 1px solid var(--line);
+  text-align: left;
+}
+
+.card-inner th {
+  background: var(--surface);
+  font-weight: 700;
+}
+
+.card-inner ul.flow-list,
+.card-inner ol.flow-list {
+  list-style: none;
+  padding-left: 0;
+  counter-reset: flow-counter;
+}
+
+.card-inner ul.flow-list > li,
+.card-inner ol.flow-list > li {
+  counter-increment: flow-counter;
+  padding: .35em .7em .35em 2.2em;
+  position: relative;
+  border-radius: 6px;
+  background: #fafaf8;
+  margin-bottom: .3em;
+}
+
+.card-inner ul.flow-list > li::before,
+.card-inner ol.flow-list > li::before {
+  content: counter(flow-counter);
+  position: absolute;
+  left: .65em;
+  top: .4em;
+  width: 1.4em;
+  height: 1.4em;
+  line-height: 1.4em;
+  text-align: center;
+  font-weight: 800;
+  font-size: .72rem;
+  color: #fff;
+  background: #1d72b8;
+  border-radius: 50%;
+}
+
 /* ─── Tag pills ─── */
 
 .tag-pill {
