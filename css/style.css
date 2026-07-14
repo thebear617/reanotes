@@ -1146,3 +1146,103 @@ button {
   line-height: 1.45;
   color: #4b5563;
 }
+
+/* ─── 文献索引 表格 ─── */
+.lit-table-wrap {
+  overflow-x: auto;
+  margin-top: 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.lit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .84rem;
+  min-width: 940px;
+}
+
+.lit-table th {
+  text-align: left;
+  font-size: .74rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  color: var(--accent);
+  text-transform: uppercase;
+  padding: .7rem .8rem;
+  background: var(--accent-bg);
+  border-bottom: 2px solid var(--accent-border);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.lit-table td {
+  padding: .65rem .8rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.lit-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.lit-table tbody tr:hover {
+  background: var(--surface-soft);
+}
+
+.lit-name {
+  font-weight: 800;
+  color: var(--text);
+  text-decoration: none;
+  line-height: 1.35;
+  display: inline-block;
+}
+
+.lit-name:hover {
+  color: var(--accent);
+}
+
+.lit-arrow {
+  color: var(--accent);
+  font-size: .8rem;
+  font-weight: 700;
+}
+
+.lit-text {
+  color: var(--muted);
+}
+
+.lit-chip {
+  display: inline-block;
+  font-size: .72rem;
+  font-weight: 800;
+  padding: .14rem .5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.d-general { color: var(--accent); background: var(--accent-bg); }
+.d-ssl     { color: var(--blue);   background: var(--blue-bg); }
+.d-cv      { color: var(--green);  background: var(--green-bg); }
+
+.s-deep   { color: var(--green); background: var(--green-bg); }
+.s-skim    { color: var(--blue);  background: var(--blue-bg); }
+.s-unread  { color: var(--muted); background: var(--surface-soft); border: 1px solid var(--line); }
+
+.lit-tag {
+  display: inline-block;
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  padding: .1rem .42rem;
+  border-radius: 6px;
+  margin: .1rem .25rem .1rem 0;
+}

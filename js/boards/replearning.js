@@ -8,6 +8,7 @@ const HOME_GRID = [
   { id: 'architecture',     icon: '🏗️', title: '架构范式对照',   desc: 'AE vs U-Net 设计哲学' },
   { id: 'notes',            icon: '📝', title: '理解笔记',       desc: '关键洞察和核心速记' },
   { id: 'venues',          icon: '🎓', title: '学术会议与期刊', desc: '顶会 / 期刊官方导航' },
+  { id: 'literature',      icon: '📚', title: '文献索引',       desc: '主线综述与阅读顺序' },
   { id: 'supervised',       icon: '🏛️', title: '监督表示学习',   desc: 'ImageNet 预训练、线性探针' },
   { id: 'graph',            icon: '🕸️', title: '图表示学习',     desc: 'GCN、Node2Vec、图自编码器' },
   { id: 'metric',           icon: '📏', title: '度量学习',       desc: 'Triplet Loss、ArcFace' },
@@ -71,6 +72,7 @@ const NAV_TREE = [
   { id: 'architecture',     icon: '🏗️', label: '架构范式对照' },
   { id: 'notes',            icon: '📝', label: '理解笔记' },
   { id: 'venues',          icon: '🎓', label: '学术会议与期刊' },
+  { id: 'literature',      icon: '📚', label: '文献索引' },
 ];
 
 /* ===== 内容数据 ===== */
@@ -859,6 +861,64 @@ CONTENT['venues'] = {
       ]
     },
   ]
+};
+
+/* ─── 文献索引（表格形式，参考 文献索引.base 字段） ─── */
+CONTENT['literature'] = {
+  title: '📚 文献索引',
+  litTable: {
+    columns: [
+      { key: 'name',        label: '文献名',     type: 'link' },
+      { key: 'date',        label: '发表日期',   type: 'text' },
+      { key: 'venue',       label: '会刊',        type: 'text' },
+      { key: 'domain',      label: '领域',       type: 'domain' },
+      { key: 'tags',        label: '标签',       type: 'tags' },
+      { key: 'status',      label: '文献状态',   type: 'status' },
+      { key: 'focus',       label: '建议重点读', type: 'text' },
+    ],
+    rows: [
+      {
+        name: 'Representation Learning: A Review and New Perspectives',
+        url: 'https://arxiv.org/abs/1206.5538',
+        date: '2012-06',
+        venue: 'TPAMI 2014',
+        domain: '表征学习', dkind: 'general',
+        tags: ['经典', '必读打底'],
+        status: '未读', statusKind: 'unread',
+        focus: '重点读 Introduction、"What makes a representation good?"、总结与开放问题；中间大量早期模型细节可先跳过。'
+      },
+      {
+        name: 'Self-supervised Learning: Generative or Contrastive',
+        url: 'https://arxiv.org/abs/2006.08218',
+        date: '2020-06',
+        venue: 'arXiv 预印本',
+        domain: '自监督（CV·NLP·图）', dkind: 'ssl',
+        tags: ['入门地图'],
+        status: '未读', statusKind: 'unread',
+        focus: '作为入门地图，不要当成最终目录；BYOL / VICReg / 掩码潜空间预测等后来方法放进去会有边界问题。'
+      },
+      {
+        name: 'A Cookbook of Self-Supervised Learning',
+        url: 'https://arxiv.org/abs/2304.12210',
+        date: '2023-04',
+        venue: 'arXiv 预印本',
+        domain: '自监督（通用）', dkind: 'ssl',
+        tags: ['工具书', 'LeCun 组'],
+        status: '未读', statusKind: 'unread',
+        focus: '不建议从头逐字读。先看目录、导论和总结，把它当作工具书查。'
+      },
+      {
+        name: 'A Survey on Self-Supervised Representation Learning',
+        url: 'https://arxiv.org/abs/2308.11455',
+        date: '2023-08',
+        venue: 'arXiv 预印本',
+        domain: '视觉自监督（CV）', dkind: 'cv',
+        tags: ['细分类', '视觉'],
+        status: '未读', statusKind: 'unread',
+        focus: '偏视觉自监督，不要把它当成所有表征学习的总分类；想看清楚现代方法分类时再读。'
+      },
+    ]
+  }
 };
 
 /* ===== 包装为板块数据（reanotes 多板块架构） ===== */

@@ -307,6 +307,36 @@
       });
     }
 
+    if (page.litTable) {
+      var t = page.litTable;
+      html += '<div class="lit-table-wrap"><table class="lit-table"><thead><tr>';
+      t.columns.forEach(function (col) {
+        html += '<th>' + col.label + '</th>';
+      });
+      html += '</tr></thead><tbody>';
+      t.rows.forEach(function (row) {
+        html += '<tr>';
+        t.columns.forEach(function (col) {
+          var val = row[col.key];
+          var cell = '';
+          if (col.type === 'link') {
+            cell = '<a class="lit-name" href="' + row.url + '" target="_blank" rel="noopener">' + val + ' <span class="lit-arrow">↗</span></a>';
+          } else if (col.type === 'tags') {
+            cell = (val || []).map(function (tg) { return '<span class="lit-tag">' + tg + '</span>'; }).join('');
+          } else if (col.type === 'domain') {
+            cell = '<span class="lit-chip d-' + (row.dkind || 'general') + '">' + val + '</span>';
+          } else if (col.type === 'status') {
+            cell = '<span class="lit-chip s-' + (row.statusKind || 'unread') + '">' + val + '</span>';
+          } else {
+            cell = '<span class="lit-text">' + (val || '') + '</span>';
+          }
+          html += '<td>' + cell + '</td>';
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+
     html += '</div>';
     contentArea.innerHTML = html;
 
