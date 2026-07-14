@@ -288,6 +288,26 @@
       html += '</div>';
     }
     html += '</div>';
+
+    if (page.linkSections) {
+      page.linkSections.forEach(function (section) {
+        html += '<section class="link-section"><h3 class="link-section-title">' + section.title + '</h3><div class="link-grid">';
+        section.items.forEach(function (item) {
+          html += '<a class="venue-card" href="' + item.url + '" target="_blank" rel="noopener">'
+                + '<span class="venue-head">'
+                + '<span class="venue-name">' + item.name + '</span>'
+                + '<span class="venue-field field-' + (item.kind || 'ml') + '">' + item.field + '</span>'
+                + '<span class="venue-arrow">↗</span>'
+                + '</span>'
+                + '<span class="venue-desc">' + item.desc + '</span>'
+                + (item.note ? '<span class="venue-note">' + item.note + '</span>' : '')
+                + '</a>';
+        });
+        html += '</div></section>';
+      });
+    }
+
+    html += '</div>';
     contentArea.innerHTML = html;
 
     // 卡片折叠

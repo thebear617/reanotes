@@ -7,6 +7,7 @@ const HOME_GRID = [
   { id: 'linear-nonlinear', icon: '⚡', title: '线性 vs 非线性', desc: '核心对照、核技巧、线性探针' },
   { id: 'architecture',     icon: '🏗️', title: '架构范式对照',   desc: 'AE vs U-Net 设计哲学' },
   { id: 'notes',            icon: '📝', title: '理解笔记',       desc: '关键洞察和核心速记' },
+  { id: 'venues',          icon: '🎓', title: '学术会议与期刊', desc: '顶会 / 期刊官方导航' },
   { id: 'supervised',       icon: '🏛️', title: '监督表示学习',   desc: 'ImageNet 预训练、线性探针' },
   { id: 'graph',            icon: '🕸️', title: '图表示学习',     desc: 'GCN、Node2Vec、图自编码器' },
   { id: 'metric',           icon: '📏', title: '度量学习',       desc: 'Triplet Loss、ArcFace' },
@@ -69,6 +70,7 @@ const NAV_TREE = [
   { id: 'linear-nonlinear', icon: '⚡', label: '线性 vs 非线性' },
   { id: 'architecture',     icon: '🏗️', label: '架构范式对照' },
   { id: 'notes',            icon: '📝', label: '理解笔记' },
+  { id: 'venues',          icon: '🎓', label: '学术会议与期刊' },
 ];
 
 /* ===== 内容数据 ===== */
@@ -815,6 +817,46 @@ CONTENT['foundation'] = {
         <tr><td>10</td><td>Simplicity of factor dependencies</td><td>高层表征因子依赖应简单（典型线性，如物理定律）</td><td><a href="#replearning/linear-nonlinear">线性 vs 非线性</a></td></tr>
       </table>
       <p>注：如何把这些先验<strong>形式化为可优化的评价准则</strong>，至今仍是开放问题——这也是表征学习最核心的研究动机之一。</p>`
+    },
+  ]
+};
+
+/* ─── 学术会议与期刊 ─── */
+CONTENT['venues'] = {
+  title: '🎓 学术会议与期刊',
+  desc: '表征学习相关的论文主要集中在以下机器学习 / 深度学习顶会顶刊。点击卡片直接跳转官方页面（新标签页打开）。',
+  linkSections: [
+    {
+      title: '顶级会议',
+      items: [
+        { name: 'NeurIPS', field: 'ML·多模态', kind: 'ml', desc: 'Conference on Neural Information Processing Systems', note: '表征学习 / 自监督学习论文的重镇；多模态表征学习常见于此', url: 'https://neurips.cc/' },
+        { name: 'ICML', field: 'ML', kind: 'ml', desc: 'International Conference on Machine Learning', note: '机器学习综合顶会，表征学习论文数量大', url: 'https://icml.cc/' },
+        { name: 'ICLR', field: '表征学习', kind: 'ml', desc: 'International Conference on Learning Representations', note: '名字直接带 Representations，表征学习论文最集中的会议之一', url: 'https://iclr.cc/' },
+        { name: 'CVPR', field: 'CV', kind: 'cv', desc: 'Conference on Computer Vision and Pattern Recognition', note: '表征学习聚焦视觉领域的主场（对比学习、自监督视觉预训练）', url: 'https://cvpr.thecvf.com/' },
+        { name: 'ICCV', field: 'CV', kind: 'cv', desc: 'International Conference on Computer Vision', note: '视觉领域顶会，自监督视觉预训练论文集中', url: 'https://iccv.thecvf.com/' },
+        { name: 'ECCV', field: 'CV', kind: 'cv', desc: 'European Conference on Computer Vision', note: '视觉领域顶会（欧洲分会）', url: 'https://eccv.ecva.net/' },
+        { name: 'ACL', field: 'NLP', kind: 'nlp', desc: 'Association for Computational Linguistics', note: 'NLP 表征学习（词向量、句子表征、预训练语言模型）主场', url: 'https://www.aclweb.org/' },
+        { name: 'EMNLP', field: 'NLP', kind: 'nlp', desc: 'Conference on Empirical Methods in Natural Language Processing', note: 'NLP 实证方法顶会，预训练语言模型论文密集', url: 'https://2026.emnlp.org/' },
+        { name: 'NAACL', field: 'NLP', kind: 'nlp', desc: 'North American Chapter of the ACL', note: 'ACL 北美分会，NLP 表征学习论文集中', url: 'https://naacl.org/' },
+        { name: 'AAAI', field: 'AI', kind: 'ai', desc: 'Association for the Advancement of Artificial Intelligence', note: '综合性人工智能顶会', url: 'https://aaai.org/conference/aaai/' },
+        { name: 'KDD', field: '图·数据', kind: 'graph', desc: 'Knowledge Discovery and Data Mining', note: '偏应用 / 数据挖掘；图表征学习常见于此', url: 'https://kdd.org/' },
+      ]
+    },
+    {
+      title: '顶级期刊',
+      items: [
+        { name: 'JMLR', field: 'ML', kind: 'ml', desc: 'Journal of Machine Learning Research', note: '机器学习权威开源期刊', url: 'https://www.jmlr.org/' },
+        { name: 'TPAMI', field: 'CV', kind: 'cv', desc: 'IEEE Transactions on Pattern Analysis and Machine Intelligence', note: '视觉 / 表征学习方向权威期刊', url: 'https://www.computer.org/csdl/journal/tp' },
+        { name: 'Nature Machine Intelligence', field: 'ML', kind: 'ml', desc: 'Nature 旗下 AI 期刊', note: '近年影响力上升较快', url: 'https://www.nature.com/natmachintell/' },
+        { name: 'Machine Learning', field: 'ML', kind: 'ml', desc: 'Springer 机器学习期刊', note: '表征学习相关论文常见于老牌 ML 期刊', url: 'https://link.springer.com/journal/10994' },
+      ]
+    },
+    {
+      title: '细分方向补充',
+      items: [
+        { name: 'TheWebConf (WWW)', field: '图·Web', kind: 'graph', desc: 'The Web Conference', note: '图表征学习常见于 KDD / WWW / ICLR', url: 'https://thewebconf.org/' },
+        { name: 'RLC', field: 'RL', kind: 'rl', desc: 'Reinforcement Learning Conference', note: '强化学习中的表征学习主场', url: 'https://rl-conference.cc/' },
+      ]
     },
   ]
 };
