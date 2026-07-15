@@ -124,6 +124,7 @@ CONTENT['venues'] = {
       items: [
         { name: 'TheWebConf (WWW)', field: '图·Web', kind: 'graph', desc: 'The Web Conference', note: '图表征学习常见于 KDD / WWW / ICLR', url: 'https://thewebconf.org/' },
         { name: 'RLC', field: 'RL', kind: 'rl', desc: 'Reinforcement Learning Conference', note: '强化学习中的表征学习主场', url: 'https://rl-conference.cc/' },
+        { name: 'papers.cool', field: '工具', kind: 'general', desc: '论文合集浏览站点', note: '按会议/年份浏览 AI 论文，支持关键词搜索和 PDF 下载', url: 'https://papers.cool/' },
       ]
     },
   ]
