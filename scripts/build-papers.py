@@ -7,11 +7,11 @@
     python3 scripts/build-papers.py --dir /path/to/translations
 
 产出:
-    js/boards/papers.js  — 论文板块数据（IIFE 格式，与其他板块一致）
+    js/boards/papers-translations.js  — 全局翻译字典（按 arXiv ID 索引）
 
 图片处理:
-    full_zh.md 中的 ![](images/xxx.png) 会被改写为相对于 index.html 的路径。
-    图片本身不需要移动——它们已经在 reanotes 仓库的 output/translations/ 下。
+    宽度超过 MAX_WIDTH(1200px) 的图片自动等比例缩小。MinerU 输出的 JPG
+    已高压缩，不做质量重编码。
 """
 
 from __future__ import annotations
@@ -297,6 +297,85 @@ def _split_sections(body: str) -> list[tuple[str, str]]:
 # JS 生成 — 翻译字典（由 litTable 交叉引用）
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# 图片优化（压缩体积，不改变文件名）
+# ---------------------------------------------------------------------------
+
+MAX_WIDTH = 1200
+JPEG_QUALITY = 85
+
+def optimize_images(translations_dir: Path, dry_run: bool = False) -> tuple[int, int]:
+    """压缩 oversize 论文图片，返回 (处理数, 节省字节数)。
+
+    仅处理宽度超过 MAX_WIDTH 的图片，等比例缩小。
+    MinerU 输出的 JPG 已是高压缩率，不做质量重编码（反而可能变大）。
+    """
+    try:
+        from PIL import Image
+    except ImportError:
+        print("[build-papers] ⚠️  Pillow 未安装，跳过图片优化 (pip install Pillow)")
+        return 0, 0
+
+    processed = 0
+    saved = 0
+    exts = {".jpg", ".jpeg", ".png"}
+
+    for date_dir in sorted(translations_dir.iterdir()):
+        if not date_dir.is_dir():
+            continue
+        for paper_dir in sorted(date_dir.iterdir()):
+            img_dir = paper_dir / "images"
+            if not img_dir.is_dir():
+                continue
+            for img_path in sorted(img_dir.iterdir()):
+                if img_path.suffix.lower() not in exts:
+                    continue
+                try:
+                    with Image.open(img_path) as im:
+                        w, h = im.size
+                        orig_size = img_path.stat().st_size
+
+                        if w <= MAX_WIDTH:
+                            continue
+
+                        # 等比例缩到 MAX_WIDTH
+                        ratio = MAX_WIDTH / w
+                        new_size_tuple = (MAX_WIDTH, int(h * ratio))
+                        im = im.resize(new_size_tuple, Image.LANCZOS)
+
+                        # 移除 EXIF，保留原质量
+                        save_kwargs = {}
+                        if im.format == "JPEG":
+                            save_kwargs["quality"] = JPEG_QUALITY
+                        if im.format == "PNG":
+                            save_kwargs["optimize"] = True
+
+                        if dry_run:
+                            print(f"  [DRY RUN] 缩放: {img_path.name}  {w}x{h} → {new_size_tuple[0]}x{new_size_tuple[1]}")
+                            processed += 1
+                            saved += max(0, orig_size - (orig_size * ratio * ratio * 0.8))
+                            continue
+
+                        im.save(img_path, **save_kwargs)
+                        new_size = img_path.stat().st_size
+                        delta = orig_size - new_size
+                        saved += delta
+                        processed += 1
+                        print(f"  图片缩放: {img_path.name}  {w}x{h} → {new_size_tuple[0]}x{new_size_tuple[1]}, "
+                              f"{orig_size//1024}KB → {new_size//1024}KB (-{max(0,delta)//1024}KB)")
+                except Exception as e:
+                    print(f"  图片优化失败: {img_path.name}: {e}")
+
+    return processed, saved
+
+_JS_ESCAPE_MAP = {
+    "\\": "\\\\",
+    "'": "\\'",
+    "\n": "\\n",
+}
+_JS_ESCAPE_RE = re.compile(r"[\\'\n]")
+
+
 _JS_ESCAPE_MAP = {
     "\\": "\\\\",
     "'": "\\'",
@@ -460,6 +539,11 @@ def main():
     print(f"[build-papers] 共 {len(papers)} 篇论文")
     for p in papers:
         print(f"  - [{p['date']}] [{p['arxiv_id']}] {p['title'][:60]}")
+
+    # 压缩 oversize 图片
+    opt_count, opt_saved = optimize_images(translations_dir, dry_run=args.dry_run)
+    if opt_count > 0:
+        print(f"[build-papers] 图片优化: {opt_count} 张, 节省 {opt_saved//1024}KB")
 
     js_content = _build_translations_js(papers)
 
