@@ -1390,3 +1390,19 @@ button {
   background: var(--accent);
   color: #fff;
 }
+
+/* ===== 学术会议卡片中的 GitHub 图标 ===== */
+.venue-github {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 .3rem;
+  cursor: pointer;
+  opacity: .6;
+  transition: opacity .15s;
+}
+.venue-github:hover {
+  opacity: 1;
+}
+.venue-github svg {
+  fill: currentColor;
+}

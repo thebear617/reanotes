@@ -122,7 +122,7 @@ CONTENT['venues'] = {
     {
       title: 'Awesome 合集',
       items: [
-        { name: 'papers.cool', field: '论文', kind: 'general', desc: 'AI 论文合集浏览站点', note: '按会议/年份浏览，支持关键词搜索和 PDF 下载', url: 'https://papers.cool/' },
+        { name: 'papers.cool', field: '论文', kind: 'general', desc: 'AI 论文合集浏览站点', note: '按会议/年份浏览，支持关键词搜索和 PDF 下载', url: 'https://papers.cool/', github: 'https://github.com/bojone/papers.cool' },
       ]
     },
   ]
