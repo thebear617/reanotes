@@ -287,6 +287,12 @@
       });
       html += '</div>';
     }
+
+    if (page.article) {
+      // 整页连续渲染（论文翻译等场景）：直接注入完整 HTML
+      html += '<div class="article-body">' + page.article + '</div>';
+    }
+
     html += '</div>';
 
     if (page.linkSections) {
@@ -339,6 +345,23 @@
 
     html += '</div>';
     contentArea.innerHTML = html;
+
+    // KaTeX 渲染（论文翻译板块用）
+    if (window.renderMathInElement) {
+      try {
+        renderMathInElement(contentArea, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false },
+            { left: '\\[', right: '\\]', display: true },
+            { left: '\\(', right: '\\)', display: false },
+          ],
+          throwOnError: false,
+        });
+      } catch (e) {
+        console.warn('KaTeX render failed:', e);
+      }
+    }
 
     // 卡片折叠
     document.querySelectorAll('.card-header').forEach(header => {

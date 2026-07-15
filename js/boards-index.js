@@ -30,4 +30,11 @@ const BOARDS = [
     desc: '科研主战场：架构、表示、训练与调优',
     accent: '#0d9488',
   },
+  {
+    id: 'papers',
+    name: '论文翻译',
+    icon: '📄',
+    desc: 'DeepSeek 翻译的学术论文',
+    accent: '#6366f1',
+  },
 ];

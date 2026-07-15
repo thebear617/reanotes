@@ -1,0 +1,41 @@
+{
+  "date": "2026-07-15",
+  "out_root": "/Users/mokaiche/Documents/htmls/.workbuddy/reanotes/output/translations",
+  "glossary": "/Users/mokaiche/Documents/htmls/.workbuddy/skills/paper-translate/glossary/general-ovs-cv-nlp.md",
+  "model": "deepseek-chat",
+  "pricing": {
+    "input_cache_hit_usd_per_1m": 0.0028,
+    "input_cache_miss_usd_per_1m": 0.14,
+    "output_usd_per_1m": 0.28,
+    "usd_to_cny": 7.25
+  },
+  "totals": {
+    "files": 1,
+    "translated": 1,
+    "skipped_exists": 0,
+    "elapsed_s": 45.943438,
+    "prompt_tokens": 10271,
+    "completion_tokens": 5629,
+    "prompt_cache_hit_tokens": 3584,
+    "prompt_cache_miss_tokens": 6687,
+    "cost_usd": 0.0025223352000000006,
+    "cost_cny": 0.018286930200000006
+  },
+  "items": [
+    {
+      "source": "/Users/mokaiche/Documents/htmls/.workbuddy/reanotes/output/translations/2026-07-15/Attention-Is-All-You-Need/full.md",
+      "output": "/Users/mokaiche/Documents/htmls/.workbuddy/reanotes/output/translations/2026-07-15/Attention-Is-All-You-Need/full_zh.md",
+      "status": "translated",
+      "chunks": 2,
+      "elapsed_s": 45.94194412231445,
+      "cost_usd": 0.0025223352000000006,
+      "cost_cny": 0.018286930200000006,
+      "prompt_tokens": 10271,
+      "completion_tokens": 5629,
+      "prompt_cache_hit_tokens": 3584,
+      "prompt_cache_miss_tokens": 6687,
+      "source_input": "https://arxiv.org/abs/1706.03762",
+      "subkind": "arxiv"
+    }
+  ]
+}
