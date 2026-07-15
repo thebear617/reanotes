@@ -123,6 +123,7 @@ CONTENT['venues'] = {
       title: 'Awesome 合集',
       items: [
         { name: 'papers.cool', field: '论文', kind: 'general', desc: 'AI 论文合集浏览站点', note: '按会议/年份浏览，支持关键词搜索和 PDF 下载', url: 'https://papers.cool/', github: 'https://github.com/bojone/papers.cool' },
+        { name: 'ICLR 2025 VizHub', field: '可视化', kind: 'general', desc: '会议论文二维语义地图可视化', note: '将 ICLR 2025 论文按语义相似度映射到 2D 空间，支持交互式探索', url: 'https://iclr2025.vizhub.ai/' },
       ]
     },
   ]
