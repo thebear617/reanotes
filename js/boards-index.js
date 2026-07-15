@@ -30,4 +30,11 @@ const BOARDS = [
     desc: '科研主战场：架构、表示、训练与调优',
     accent: '#0d9488',
   },
+  {
+    id: 'literature',
+    name: '文献索引',
+    icon: '📚',
+    desc: '学术论文索引与会议期刊导航',
+    accent: '#8b5cf6',
+  },
 ];
