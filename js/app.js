@@ -13,7 +13,7 @@
   const topTitle     = document.getElementById('topTitle');
 
   /* ===== State ===== */
-  let currentBoard = null;   // board id, or null = 总览仪表盘
+  let currentBoard = null;   // board id
   let activeId     = null;
 
   /* ===== Helpers ===== */
@@ -42,7 +42,11 @@
 
   function route() {
     const { board, page } = parseHash();
-    if (!board || !BOARD_DATA[board]) { renderDashboard(); return; }
+    if (!board || !BOARD_DATA[board]) {
+      // 无 hash 或无效板块 → 跳转到第一个板块
+      window.location.hash = BOARDS[0].id;
+      return;
+    }
     if (currentBoard !== board) enterBoard(board);
     if (page && (BOARD_DATA[board].content[page] || _isTranslationPage(page))) {
       renderContentPage(page);
@@ -429,12 +433,6 @@
   function renderBoardSwitcher() {
     if (!switcher) return;
     switcher.innerHTML = '';
-    const overview = document.createElement('a');
-    overview.href = '#';
-    overview.className = 'switcher-item switcher-overview';
-    overview.dataset.board = '';
-    overview.textContent = '☰ 总览';
-    switcher.appendChild(overview);
 
     BOARDS.forEach(b => {
       const a = document.createElement('a');
@@ -449,7 +447,7 @@
     switcher.querySelectorAll('.switcher-item').forEach(el => {
       el.addEventListener('click', function (e) {
         e.preventDefault();
-        window.location.hash = this.dataset.board;  // '' => 总览
+        window.location.hash = this.dataset.board;
       });
     });
   }
@@ -466,17 +464,17 @@
     if (e.key === 'Escape') closeSidebar();
   });
 
-  /* ===== 顶栏点击：eyebrow→总览，title→板块首页 ===== */
+  /* ===== 顶栏点击：eyebrow→第一个板块，title→板块首页 ===== */
   document.querySelector('.top-bar-left').addEventListener('click', function (e) {
     const target = e.target.closest('.top-title, .top-eyebrow');
     if (!target) return;
     e.preventDefault();
     if (target.classList.contains('top-eyebrow')) {
-      window.location.hash = '';
+      window.location.hash = BOARDS[0].id;
     } else if (currentBoard) {
       window.location.hash = currentBoard;
     } else {
-      window.location.hash = '';
+      window.location.hash = BOARDS[0].id;
     }
   });
 
