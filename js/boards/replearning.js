@@ -878,6 +878,16 @@ CONTENT['literature'] = {
     ],
     rows: [
       {
+        name: 'Attention Is All You Need',
+        url: 'https://arxiv.org/abs/1706.03762',
+        date: '2017-06',
+        venue: 'NeurIPS 2017',
+        domain: 'NLP·Transformer', dkind: 'nlp',
+        tags: ['经典', '必读'],
+        status: '已读', statusKind: 'deep',
+        focus: 'Transformer 原始论文，NLP 领域的划时代之作。'
+      },
+      {
         name: 'Representation Learning: A Review and New Perspectives',
         url: 'https://arxiv.org/abs/1206.5538',
         date: '2012-06',

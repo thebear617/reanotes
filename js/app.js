@@ -44,11 +44,16 @@
     const { board, page } = parseHash();
     if (!board || !BOARD_DATA[board]) { renderDashboard(); return; }
     if (currentBoard !== board) enterBoard(board);
-    if (page && BOARD_DATA[board].content[page]) {
+    if (page && (BOARD_DATA[board].content[page] || _isTranslationPage(page))) {
       renderContentPage(page);
     } else {
       renderBoardHome(board);
     }
+  }
+
+  function _isTranslationPage(id) {
+    var m = id && id.match(/^trans-(.+)$/);
+    return m && window.PAPER_TRANSLATIONS && window.PAPER_TRANSLATIONS[m[1]];
   }
 
   /* ===== 总览仪表盘 ===== */
@@ -243,7 +248,22 @@
   function renderContentPage(id) {
     const data = boardData(currentBoard);
     if (!data) return;
-    const page = data.content[id];
+    var page = data.content[id];
+
+    // 翻译路由：id 格式为 trans-<arxivId>（如 trans-1706.03762）
+    if (!page) {
+      var transMatch = id && id.match(/^trans-(.+)$/);
+      if (transMatch && window.PAPER_TRANSLATIONS) {
+        var transData = window.PAPER_TRANSLATIONS[transMatch[1]];
+        if (transData) {
+          page = {
+            title: transData.title,
+            desc: '翻译日期: ' + transData.date,
+            article: transData.article,
+          };
+        }
+      }
+    }
     if (!page) return;
 
     // 侧栏高亮 + 展开父分类
@@ -326,7 +346,17 @@
           var val = row[col.key];
           var cell = '';
           if (col.type === 'link') {
-            cell = '<a class="lit-name" href="' + row.url + '" target="_blank" rel="noopener">' + val + ' <span class="lit-arrow">↗</span></a>';
+            // 检查是否有翻译
+            var arxivMatch = row.url && row.url.match(/arxiv\.org\/abs\/([\d.]+(?:v\d+)?)/);
+            var arxivId = arxivMatch ? arxivMatch[1] : '';
+            var hasTranslation = arxivId && window.PAPER_TRANSLATIONS && window.PAPER_TRANSLATIONS[arxivId];
+            if (hasTranslation) {
+              cell = '<a class="lit-name lit-translated" href="#' + currentBoard + '/trans-' + arxivId + '">'
+                   + val + ' <span class="lit-badge">📖 中文版</span></a>';
+            } else {
+              cell = '<a class="lit-name" href="' + row.url + '" target="_blank" rel="noopener">'
+                   + val + ' <span class="lit-arrow">↗</span></a>';
+            }
           } else if (col.type === 'tags') {
             cell = (val || []).map(function (tg) { return '<span class="lit-tag">' + tg + '</span>'; }).join('');
           } else if (col.type === 'domain') {

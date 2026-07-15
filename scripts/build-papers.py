@@ -294,7 +294,7 @@ def _split_sections(body: str) -> list[tuple[str, str]]:
     return sections
 
 # ---------------------------------------------------------------------------
-# JS 生成
+# JS 生成 — 翻译字典（由 litTable 交叉引用）
 # ---------------------------------------------------------------------------
 
 _JS_ESCAPE_MAP = {
@@ -307,103 +307,45 @@ _JS_ESCAPE_RE = re.compile(r"[\\'\n]")
 def _js_str(s: str) -> str:
     return "'" + _JS_ESCAPE_RE.sub(lambda m: _JS_ESCAPE_MAP[m.group()], s) + "'"
 
-def _build_papers_js(papers: list[dict]) -> str:
-    """生成 js/boards/papers.js 的内容。"""
-    # 首页数据
-    home_grid_items = []
-    for p in papers:
-        item = (
-            "    { id: " + _js_str(p["id"]) + ", "
-            "icon: '📄', "
-            "title: " + _js_str(p["short_title"]) + ", "
-            "desc: " + _js_str(p["date"]) + " }"
-        )
-        home_grid_items.append(item)
+def _extract_arxiv_id(source_input: str) -> str:
+    """从 URL 或路径中提取 arXiv ID。"""
+    # 尝试匹配 arXiv URL: arxiv.org/abs/XXXX.XXXXX 或 arxiv.org/pdf/XXXX.XXXXX
+    m = re.search(r"arxiv\.org/(?:abs|pdf)/([\d.]+(?:v\d+)?)", source_input)
+    if m:
+        return m.group(1)
+    return ""
 
-    home_updates_items = []
-    for p in papers:
-        item = (
-            "  { date: " + _js_str(p["date"]) + ", "
-            "text: " + _js_str(p["title"]) + ", "
-            "id: " + _js_str(p["id"]) + " }"
-        )
-        home_updates_items.append(item)
-
-    # 导航树
-    nav_items = []
-    # 按日期分组
-    by_date: dict[str, list[dict]] = {}
-    for p in papers:
-        by_date.setdefault(p["date"], []).append(p)
-
-    for date_str in sorted(by_date.keys(), reverse=True):
-        children = []
-        for p in by_date[date_str]:
-            children.append("        { id: " + _js_str(p["id"]) + ", label: " + _js_str(p["short_title"]) + " }")
-        nav_items.append(
-            "    {\n"
-            "      id: " + _js_str(f"group-{date_str}") + ", icon: '📅',\n"
-            "      label: " + _js_str(date_str) + ",\n"
-            "      children: [\n" + ",\n".join(children) + "\n"
-            "      ]\n"
-            "    }"
-        )
-
-    # 内容：把全部章节拼成一个完整 HTML 字符串，整页连续渲染
-    content_entries = []
+def _build_translations_js(papers: list[dict]) -> str:
+    """生成 js/boards/papers-translations.js — 全局翻译字典。"""
+    entries = []
     for p in papers:
         article_parts = []
         for section_title, section_html in p["sections"]:
             article_parts.append(f"<h2>{section_title}</h2>\n{section_html}")
         full_article = "\n".join(article_parts)
 
-        entry = (
-            "CONTENT[" + _js_str(p["id"]) + "] = {\n"
-            "  title: " + _js_str(p["title"]) + ",\n"
-            "  desc: " + _js_str(f"翻译日期: {p['date']} | 原文: {p['source']}") + ",\n"
-            "  article: " + _js_str(full_article) + "\n"
-            "};"
+        arxiv_id = p.get("arxiv_id", "")
+        if not arxiv_id:
+            continue
+
+        entries.append(
+            "  " + _js_str(arxiv_id) + ": {\n"
+            "    title: " + _js_str(p["title"]) + ",\n"
+            "    date: " + _js_str(p["date"]) + ",\n"
+            "    article: " + _js_str(full_article) + ",\n"
+            "  }"
         )
-        content_entries.append(entry)
 
-    # 组装完整文件
-    return f"""(function () {{
-/* ===== 首页数据 ===== */
-const HOME_GRID = [
-{",\n".join(home_grid_items)}
-];
-
-const HOME_UPDATES = [
-{",\n".join(home_updates_items)}
-];
-
-/* ===== 导航树 ===== */
-const NAV_TREE = [
-{",\n".join(nav_items)}
-];
-
-/* ===== 内容 ===== */
-const CONTENT = {{}};
-
-CONTENT['home'] = {{
-  type: 'home',
-  title: '论文翻译',
-  desc: 'DeepSeek 翻译的学术论文中文版。点击左侧导航或下方卡片进入阅读。',
-  gridCards: HOME_GRID,
-  recentUpdates: HOME_UPDATES,
-}};
-
-{chr(10).join(content_entries)}
-
-/* ===== 注册 ===== */
-window.BOARD_DATA = window.BOARD_DATA || {{}};
-BOARD_DATA['papers'] = {{
-  home: CONTENT['home'],
-  navTree: NAV_TREE,
-  content: CONTENT,
-}};
-}})();
-"""
+    return (
+        "/* ===== 论文翻译字典 =====\n"
+        " * 由 scripts/build-papers.py 自动生成。\n"
+        " * key = arXiv ID（如 1706.03762），value = { title, date, article }\n"
+        " * 各板块 litTable 渲染时自动检测本字典，已翻译的论文替换为内部跳转链接。\n"
+        " */\n"
+        "window.PAPER_TRANSLATIONS = {\n"
+        + ",\n".join(entries) + "\n"
+        "};\n"
+    )
 
 # ---------------------------------------------------------------------------
 # 主流程
@@ -420,6 +362,24 @@ def collect_papers(translations_dir: Path) -> list[dict]:
         if not date_dir.is_dir():
             continue
         date_str = date_dir.name
+
+        # 读 summary.json 获取论文名 → arXiv ID 的映射
+        arxiv_map = {}
+        summary_file = date_dir / "summary.json"
+        if summary_file.is_file():
+            try:
+                summary = json.loads(summary_file.read_text(encoding="utf-8"))
+                for item in summary.get("items", []):
+                    source = item.get("source", "")
+                    arxiv_input = item.get("source_input", "")
+                    # 从 item.source 路径提取目录名
+                    paper_name = Path(source).parent.name
+                    arxiv_id = _extract_arxiv_id(arxiv_input)
+                    if paper_name and arxiv_id:
+                        arxiv_map[paper_name] = arxiv_id
+            except (json.JSONDecodeError, KeyError):
+                pass
+
         for paper_dir in sorted(date_dir.iterdir()):
             if not paper_dir.is_dir():
                 continue
@@ -427,7 +387,12 @@ def collect_papers(translations_dir: Path) -> list[dict]:
             if not zh_md.is_file():
                 continue
 
-            print(f"[build-papers] 处理: {date_str}/{paper_dir.name}")
+            arxiv_id = arxiv_map.get(paper_dir.name, "")
+            if not arxiv_id:
+                print(f"[build-papers] ⚠️  无法确定 arXiv ID: {date_str}/{paper_dir.name}，跳过")
+                continue
+
+            print(f"[build-papers] 处理: {date_str}/{paper_dir.name} → {arxiv_id}")
             raw = zh_md.read_text(encoding="utf-8")
 
             # 提取标题
@@ -455,6 +420,7 @@ def collect_papers(translations_dir: Path) -> list[dict]:
 
             papers.append({
                 "id": f"paper-{date_str}-{paper_dir.name}",
+                "arxiv_id": arxiv_id,
                 "date": date_str,
                 "en_title": en_title,
                 "cn_title": cn_title,
@@ -479,7 +445,7 @@ def main():
     reanotes_root = script_dir.parent  # reanotes/
 
     translations_dir = args.dir or (reanotes_root / "output" / "translations")
-    output_js = reanotes_root / "js" / "boards" / "papers.js"
+    output_js = reanotes_root / "js" / "boards" / "papers-translations.js"
 
     print(f"[build-papers] reanotes 根:  {reanotes_root}")
     print(f"[build-papers] 翻译目录:    {translations_dir}")
@@ -488,14 +454,14 @@ def main():
     papers = collect_papers(translations_dir)
 
     if not papers:
-        print("[build-papers] ⚠️  没有找到任何翻译产物。先跑 paper_translate.py 吧。")
+        print("[build-papers] ⚠️  没有找到任何翻译产物（或无法确定 arXiv ID）。先跑 paper_translate.py 吧。")
         return
 
     print(f"[build-papers] 共 {len(papers)} 篇论文")
     for p in papers:
-        print(f"  - [{p['date']}] {p['title'][:60]}")
+        print(f"  - [{p['date']}] [{p['arxiv_id']}] {p['title'][:60]}")
 
-    js_content = _build_papers_js(papers)
+    js_content = _build_translations_js(papers)
 
     if args.dry_run:
         print("\n[build-papers] --dry-run 模式，不写文件。预览前 500 字符:")
@@ -507,28 +473,16 @@ def main():
     print(f"\n[build-papers] ✅ 已生成: {output_js}")
     print(f"[build-papers] 文件大小:   {output_js.stat().st_size:,} bytes")
 
-    # 检查是否需要更新 index.html
+    # 检查 index.html 是否引用了 papers-translations.js
     index_html = reanotes_root / "index.html"
     if index_html.is_file():
         content = index_html.read_text(encoding="utf-8")
-        if "js/boards/papers.js" not in content:
-            print(f"\n[build-papers] ⚠️  index.html 尚未引用 papers.js。")
-            print(f"   请在 index.html 的 <script> 列表中（app.js 之前）添加：")
-            print(f'   <script src="js/boards/papers.js"></script>')
+        if "papers-translations.js" not in content:
+            print(f"\n[build-papers] ⚠️  index.html 尚未引用 papers-translations.js。")
+            print(f"   请在 boards 脚本之前添加：")
+            print(f'   <script src="js/boards/papers-translations.js"></script>')
         else:
-            print(f"[build-papers] ✅ index.html 已引用 papers.js")
-
-    # 检查是否需要更新 boards-index.js
-    boards_index = reanotes_root / "js" / "boards-index.js"
-    if boards_index.is_file():
-        content = boards_index.read_text(encoding="utf-8")
-        if "'papers'" not in content:
-            print(f"\n[build-papers] ⚠️  boards-index.js 尚未注册 papers 板块。")
-            print(f"   请在 BOARDS 数组中添加：")
-            print(f"   {{ id: 'papers', name: '论文翻译', icon: '📄',")
-            print(f"     desc: 'DeepSeek 翻译的学术论文', accent: '#6366f1' }},")
-        else:
-            print(f"[build-papers] ✅ boards-index.js 已注册 papers 板块")
+            print(f"[build-papers] ✅ index.html 已引用 papers-translations.js")
 
 
 if __name__ == "__main__":

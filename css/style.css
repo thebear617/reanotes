@@ -1372,3 +1372,21 @@ button {
   font-size: 1.05em;
   color: var(--accent);
 }
+
+/* ===== 文献表格中的已翻译标记 ===== */
+.lit-translated {
+  color: var(--accent) !important;
+}
+.lit-badge {
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-bg);
+  padding: .08rem .4rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.lit-name:hover .lit-badge {
+  background: var(--accent);
+  color: #fff;
+}
