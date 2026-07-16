@@ -321,16 +321,11 @@
       html += '<div class="timeline">';
       page.timeline.forEach(function (item, idx) {
         var tlId = 'tl-' + idx;
-        var isLast = idx === page.timeline.length - 1;
         var expanded = idx === 0;  // 第一个默认展开
         html += '<div class="tl-item' + (expanded ? ' expanded' : ' collapsed') + '" id="' + tlId + '">'
-              + '<div class="timeline-marker">'
-              + '<div class="timeline-dot tl-dot-done"></div>'
-              + (isLast ? '' : '<div class="timeline-line"></div>')
-              + '</div>'
               + '<div class="tl-card">'
               + '<div class="tl-card-header" data-tl="' + tlId + '">'
-              + '<span class="tl-date">📅 ' + item.date + '</span>'
+              + '<span class="tl-date">' + item.date + '</span>'
               + '<span class="tl-title">' + item.title + '</span>'
               + (item.tags ? '<span class="tl-tags">' + item.tags.map(function (t) { return '<span class="tl-tag">' + t + '</span>'; }).join('') + '</span>' : '')
               + '<span class="tl-arrow">▶</span>'
