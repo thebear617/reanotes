@@ -10,8 +10,7 @@ dir:
 
 ## 基础知识
 
-- [表征学习的数学模型和研究目的](foundation/representation-learning-model.md)
-- [线性表征跟非线性表征的比较](foundation/linear-vs-nonlinear.md)
+- [基础知识](foundation/)
 
 ## 学习范式
 
