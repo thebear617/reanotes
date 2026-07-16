@@ -125,8 +125,16 @@ python3 scripts/build-cards.py --check
 ## 部署
 
 本仓库**双托管**：
-- **GitHub Pages**：仓库名 `reanotes`，`git push origin main` 后自动构建，地址 `https://thebear617.github.io/reanotes/`。
-- **Vercel（自定义域名 `rea.thebear617.cn`）**：在 Vercel 导入 `thebear617/reanotes` 仓库并绑定该域名（DNS 已指向 Vercel），随 `main` 自动部署。
+
+- **GitHub Pages**：`.github/workflows/deploy.yml` 会使用 `/reanotes/` 基础路径构建并发布 `dist/`，地址 `https://thebear617.github.io/reanotes/`。首次切换时需要在仓库 Settings → Pages 中把 Source 改成 **GitHub Actions**。
+- **Vercel（自定义域名 `rea.thebear617.cn`）**：`vercel.json` 会在根路径构建并发布 `dist/`，随 `main` 自动部署。
+
+部署前可在本地执行：
+
+```bash
+pnpm lint
+pnpm build
+```
 
 ```bash
 git push origin main
