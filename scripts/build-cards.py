@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""build-cards.py — 从 content/replearning/**.md 生成 js/boards/replearning.cards.js。
+"""build-cards.py — 从 Markdown 内容目录生成表征学习页面数据。
 
 设计目标（与 personal/build-diary.py 同构）：
     Markdown 当源文件，push 前用本脚本把 .md 编译成「内联 HTML 字符串」，
     运行时零依赖、零 fetch、无 file:// 问题，单套渲染逻辑。
 
 约定：
-    content/replearning/<page>/<slug>.md   一张卡片一个文件
+    content/tabs/replearning/pages.json                  页面目录与卡片排列
+    content/tabs/replearning/boards/<board>/<slug>.md    一张卡片一个文件
     文件头 frontmatter：
         ---
         icon: 🏛️
@@ -27,6 +28,7 @@
 用法：
     python3 scripts/build-cards.py            # 生成
     python3 scripts/build-cards.py --dry-run # 只打印统计，不写文件
+    python3 scripts/build-cards.py --check   # 检查生成物是否最新
 """
 
 from __future__ import annotations
@@ -148,6 +150,20 @@ def _md_to_html(md_text: str) -> str:
             i += 1
             continue
 
+        # 标准 Markdown 允许直接嵌入 HTML。复杂表格、布局和 callout 可用
+        # 原生 HTML 表达；编译器保持原样，避免损失 colspan/style 等信息。
+        if stripped.startswith("<"):
+            flush_buf(buf_type, buf)
+            raw_html = [line]
+            i += 1
+            while i < n and lines[i].strip() != "":
+                raw_html.append(lines[i])
+                i += 1
+            out.append("\n".join(raw_html))
+            buf_type = None
+            buf = []
+            continue
+
         if stripped.startswith("```"):
             flush_buf(buf_type, buf)
             buf_type = "code"
@@ -259,7 +275,7 @@ def _callout_bridge(html: str) -> str:
             return m.group(0)
         title = parts[0]
         rest_lines = [ln for ln in parts[1:] if ln.strip()]
-        rest_html = "".join(f"<p>{ln}</p>" for ln in rest_lines)
+        rest_html = f"<p>{'<br>'.join(rest_lines)}</p>" if rest_lines else ""
         return (
             f'<div class="example-box">'
             f'<div class="example-box-title">{title}</div>'
@@ -275,9 +291,11 @@ def _apply_bridge(html: str) -> str:
     html = html.replace("<ol>", '<ol class="nested-list">')
     # 表格 → comp-table
     html = html.replace("<table>", '<table class="comp-table">')
-    # 行内 code → code-inline（但不影响 <pre> 里的 code）
-    html = html.replace("<code>", '<code class="code-inline">')
-    html = re.sub(r"<pre><code class=\"code-inline\">", "<pre><code>", html)
+    # 行内 code → 现有设计使用的 code-inline span（不影响代码块）
+    html = html.replace("<code>", '<span class="code-inline">')
+    html = html.replace("</code>", "</span>")
+    html = re.sub(r"<pre><span class=\"code-inline\">", "<pre><code>", html)
+    html = html.replace("</span></pre>", "</code></pre>")
     # callout
     html = _callout_bridge(html)
     return html
@@ -312,59 +330,137 @@ def _parse_frontmatter(text: str):
 # 主流程
 # ---------------------------------------------------------------------------
 
-def main():
-    parser = argparse.ArgumentParser(description="从 content/replearning/**.md 生成卡片 JS")
-    parser.add_argument("--dry-run", action="store_true", help="只打印统计，不写文件")
-    args = parser.parse_args()
+def _fail(message: str):
+    print(f"[build-cards] ❌ {message}", file=sys.stderr)
+    raise SystemExit(1)
 
-    script_dir = Path(__file__).resolve().parent
-    reanotes_root = script_dir.parent
-    content_dir = reanotes_root / "content" / "replearning"
-    out_js = reanotes_root / "js" / "boards" / "replearning.cards.js"
 
-    if not content_dir.is_dir():
-        print(f"[build-cards] ⚠️ 内容目录不存在: {content_dir}")
-        sys.exit(1)
+def _load_catalog(content_dir: Path):
+    catalog_path = content_dir / "pages.json"
+    if not catalog_path.is_file():
+        _fail(f"缺少内容目录: {catalog_path}")
+    try:
+        catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        _fail(f"pages.json 格式错误: {exc}")
 
-    cards: dict[str, list] = {}
-    for page_dir in sorted(content_dir.iterdir()):
-        if not page_dir.is_dir():
-            continue
-        page = page_dir.name
+    pages = catalog.get("pages")
+    if not isinstance(pages, list) or not pages:
+        _fail("pages.json 必须包含非空 pages 数组")
+    return pages
+
+
+def _build_content(content_dir: Path):
+    pages = _load_catalog(content_dir)
+    generated: dict[str, dict] = {}
+    referenced_files: set[Path] = set()
+
+    for page in pages:
+        page_id = page.get("id")
+        title = page.get("title")
+        desc = page.get("desc")
+        card_entries = page.get("cards")
+        if not page_id or not title or not isinstance(desc, str):
+            _fail("每个页面必须包含 id、title 和 desc")
+        if page_id in generated:
+            _fail(f"页面 id 重复: {page_id}")
+        if not isinstance(card_entries, list) or not card_entries:
+            _fail(f"页面 {page_id} 没有 cards")
+
         page_cards = []
-        for md_file in sorted(page_dir.glob("*.md")):
+        for entry in card_entries:
+            overrides = {}
+            if isinstance(entry, str):
+                relative_path = entry
+            elif isinstance(entry, dict) and isinstance(entry.get("path"), str):
+                relative_path = entry["path"]
+                overrides = {k: v for k, v in entry.items() if k != "path"}
+            else:
+                _fail(f"页面 {page_id} 含无效卡片条目: {entry!r}")
+
+            md_file = (content_dir / relative_path).resolve()
+            try:
+                md_file.relative_to(content_dir.resolve())
+            except ValueError:
+                _fail(f"卡片路径越出内容目录: {relative_path}")
+            if not md_file.is_file() or md_file.suffix != ".md":
+                _fail(f"找不到 Markdown 卡片: {relative_path}")
+            referenced_files.add(md_file)
+
             raw = md_file.read_text(encoding="utf-8")
             meta, body = _parse_frontmatter(raw)
-            html = _md_to_html(body)
-            html = _apply_bridge(html)
+            if not meta.get("title"):
+                _fail(f"卡片缺少 frontmatter title: {relative_path}")
+            if not body.strip():
+                _fail(f"卡片正文为空: {relative_path}")
             card = {
                 "icon": meta.get("icon", ""),
-                "title": meta.get("title", md_file.stem),
+                "title": meta["title"],
                 "tags": meta.get("tags", []),
                 "expanded": bool(meta.get("expanded", False)),
-                "body": html,
+                "body": _apply_bridge(_md_to_html(body)),
             }
+            unknown_overrides = set(overrides) - {"icon", "title", "tags", "expanded"}
+            if unknown_overrides:
+                _fail(
+                    f"卡片 {relative_path} 含未知覆盖字段: "
+                    + ", ".join(sorted(unknown_overrides))
+                )
+            card.update(overrides)
             page_cards.append(card)
-        if page_cards:
-            cards[page] = page_cards
 
-    total = sum(len(v) for v in cards.values())
-    print(f"[build-cards] 扫描到 {len(cards)} 个页面、{total} 张卡片")
+        generated[page_id] = {"title": title, "desc": desc, "cards": page_cards}
 
-    if args.dry_run:
-        for page, clist in cards.items():
-            print(f"  - {page}: {len(clist)} 张")
-        return
+    boards_dir = content_dir / "boards"
+    all_markdown = {path.resolve() for path in boards_dir.rglob("*.md")}
+    unreferenced = sorted(all_markdown - referenced_files)
+    if unreferenced:
+        relative = ", ".join(str(path.relative_to(content_dir)) for path in unreferenced)
+        _fail(f"存在未登记的 Markdown 文件: {relative}")
 
-    js = (
-        "/* ===== 表征学习 · 卡片数据 =====\n"
-        " * 由 scripts/build-cards.py 从 content/replearning/**.md 自动生成。\n"
-        " * 请勿手改本文件；改 content/ 下的 .md 后重跑 build-cards.py。\n"
+    return generated
+
+
+def _render_js(content: dict[str, dict]) -> str:
+    return (
+        "/* ===== 表征学习 · Markdown 编译内容 =====\n"
+        " * 由 scripts/build-cards.py 根据 content/tabs/replearning/pages.json 与 Markdown 自动生成。\n"
+        " * 请勿手改本文件；编辑 content/ 后重新运行构建脚本。\n"
         " */\n"
-        "window.REPLEARNING_CARDS = "
-        + json.dumps(cards, ensure_ascii=False, indent=2)
+        "window.REPLEARNING_CONTENT = "
+        + json.dumps(content, ensure_ascii=False, indent=2)
         + ";\n"
     )
+
+
+def main():
+    parser = argparse.ArgumentParser(description="从 Markdown 内容目录生成表征学习页面 JS")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--dry-run", action="store_true", help="只打印统计，不写文件")
+    mode.add_argument("--check", action="store_true", help="检查生成物是否最新")
+    args = parser.parse_args()
+
+    reanotes_root = Path(__file__).resolve().parent.parent
+    content_dir = reanotes_root / "content" / "tabs" / "replearning"
+    out_js = reanotes_root / "js" / "boards" / "replearning.cards.js"
+    if not content_dir.is_dir():
+        _fail(f"内容目录不存在: {content_dir}")
+
+    content = _build_content(content_dir)
+    total = sum(len(page["cards"]) for page in content.values())
+    print(f"[build-cards] 扫描到 {len(content)} 个页面、{total} 个卡片位置")
+    if args.dry_run:
+        for page_id, page in content.items():
+            print(f"  - {page_id}: {len(page['cards'])} 张")
+        return
+
+    js = _render_js(content)
+    if args.check:
+        if not out_js.is_file() or out_js.read_text(encoding="utf-8") != js:
+            _fail("生成物已过期，请运行 python3 scripts/build-cards.py")
+        print("[build-cards] ✅ 生成物已是最新")
+        return
+
     out_js.parent.mkdir(parents=True, exist_ok=True)
     out_js.write_text(js, encoding="utf-8")
     print(f"[build-cards] ✅ 已生成: {out_js} ({out_js.stat().st_size:,} bytes)")

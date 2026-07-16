@@ -5,8 +5,8 @@
       "title": "📐 监督表示学习",
       "desc": "最常见的方式：用大量人工标注的类别标签训练分类器，把分类器中间层的特征作为通用表示。",
       "cards": [
-        "supervised/ImageNet 预训练范式.md",
-        "supervised/监督表示的特性.md"
+        "boards/supervised/ImageNet 预训练范式.md",
+        "boards/supervised/监督表示的特性.md"
       ]
     },
     {
@@ -14,10 +14,10 @@
       "title": "📐 自监督表示学习",
       "desc": "核心思想：不需要人工标注，从数据自身的结构构造“伪标签”或 pretext 任务，让模型自己学自己。这是过去五年最活跃的方向。",
       "cards": [
-        "self-supervised/生成式（Generative）.md",
-        "self-supervised/对比式（Contrastive）.md",
-        "self-supervised/非对比式 _ 冗余消除（Non-contrastive）.md",
-        "self-supervised/三大范式的对比.md"
+        "boards/self-supervised/生成式（Generative）.md",
+        "boards/self-supervised/对比式（Contrastive）.md",
+        "boards/self-supervised/非对比式 _ 冗余消除（Non-contrastive）.md",
+        "boards/self-supervised/三大范式的对比.md"
       ]
     },
     {
@@ -25,8 +25,8 @@
       "title": "📐 传统无监督表示学习",
       "desc": "完全不依赖标签，只利用数据本身的统计分布来学习表示。在深度流行之前，这是表示学习的主要形式。",
       "cards": [
-        "unsupervised/经典无监督方法.md",
-        "unsupervised/流形学习.md"
+        "boards/unsupervised/经典无监督方法.md",
+        "boards/unsupervised/流形学习.md"
       ]
     },
     {
@@ -34,7 +34,7 @@
       "title": "📐 半监督、弱监督表示学习",
       "desc": "在只有少量标签 + 大量无标签数据的场景下学习表示。这种设置更贴近现实——标注成本高，但原始数据很便宜。",
       "cards": [
-        "semi-supervised/半监督核心方法.md"
+        "boards/semi-supervised/半监督核心方法.md"
       ]
     },
     {
@@ -42,8 +42,8 @@
       "title": "🎯 度量学习",
       "desc": "目标是学到一个嵌入空间，其中语义相似的样本距离近、语义不同的样本距离远。核心在于“距离度量”的定义和优化。",
       "cards": [
-        "metric/度量学习的核心思想.md",
-        "metric/代表损失函数与方法.md"
+        "boards/metric/度量学习的核心思想.md",
+        "boards/metric/代表损失函数与方法.md"
       ]
     },
     {
@@ -51,8 +51,8 @@
       "title": "🎯 迁移表示学习",
       "desc": "在一个任务上学的表示能否迁移到另一个任务？这是表示学习的终极目标之一——“学到通用的特征”本来就是为迁移准备的。",
       "cards": [
-        "transfer/预训练 + 微调范式.md",
-        "transfer/迁移学习的调式.md"
+        "boards/transfer/预训练 + 微调范式.md",
+        "boards/transfer/迁移学习的调式.md"
       ]
     },
     {
@@ -60,18 +60,8 @@
       "title": "🎯 多任务表示学习",
       "desc": "用一个共享表示同时学习多个相关任务，期望任务之间互相促进、共享知识。",
       "cards": [
-        "multitask/多任务学习的核心思想.md",
-        "multitask/关键挑战.md"
-      ]
-    },
-    {
-      "id": "linear-nonlinear",
-      "title": "⚡ 线性 vs 非线性表示",
-      "desc": "表示学习最早的核心分类方式——表示的编码映射是否为线性变换。这个二分法贯穿了整个领域的历史。",
-      "cards": [
-        "linear-nonlinear/本质差别在哪里？.md",
-        "linear-nonlinear/核技巧：一个有趣的中间地带.md",
-        "linear-nonlinear/现代视角：线性探针.md"
+        "boards/multitask/多任务学习的核心思想.md",
+        "boards/multitask/关键挑战.md"
       ]
     },
     {
@@ -79,9 +69,9 @@
       "title": "🏗️ 架构范式对照",
       "desc": "从架构设计的角度，比较不同范式之间的关系。重点是自编码器（AE）和 U-Net——它们共享编码器-解码器外形，但设计哲学截然不同。",
       "cards": [
-        "architecture/编码器-解码器家族树.md",
-        "architecture/核心对照：跳跃连接（Skip Connection）.md",
-        "architecture/完整的归属链.md"
+        "boards/architecture/编码器-解码器家族树.md",
+        "boards/architecture/核心对照：跳跃连接（Skip Connection）.md",
+        "boards/architecture/完整的归属链.md"
       ]
     },
     {
@@ -89,12 +79,12 @@
       "title": "📝 理解笔记",
       "desc": "阅读和讨论中沉淀下来的核心理解——用最容易记住的方式组织。",
       "cards": [
-        "notes/自编码器的本质：信息瓶颈.md",
-        "notes/对比学习的本质：拉近正推开负.md",
-        "notes/非对比式方法的启示：负样本不是必须的.md",
-        "notes/线性 vs 非线性：一个激活函数的差距.md",
-        "notes/AE vs U-Net：同一个父亲，不同的母亲.md",
-        "notes/自监督表示学习三大范式速记.md"
+        "boards/notes/自编码器的本质：信息瓶颈.md",
+        "boards/notes/对比学习的本质：拉近正推开负.md",
+        "boards/notes/非对比式方法的启示：负样本不是必须的.md",
+        "boards/notes/线性 vs 非线性：一个激活函数的差距.md",
+        "boards/notes/AE vs U-Net：同一个父亲，不同的母亲.md",
+        "boards/notes/自监督表示学习三大范式速记.md"
       ]
     },
     {
@@ -102,13 +92,11 @@
       "title": "📜 基础知识",
       "desc": "表征学习为什么重要，以及背后的数学模型与研究目的。",
       "cards": [
-        "foundation/表征学习-数学模型和研究目的.md",
+        "boards/foundation/表征学习-数学模型和研究目的.md",
         {
-          "path": "linear-nonlinear/本质差别在哪里？.md",
+          "path": "boards/foundation/线性表征跟非线性表征的比较.md",
           "expanded": false
-        },
-        "linear-nonlinear/核技巧：一个有趣的中间地带.md",
-        "linear-nonlinear/现代视角：线性探针.md"
+        }
       ]
     }
   ]

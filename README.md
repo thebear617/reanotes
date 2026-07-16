@@ -26,52 +26,89 @@ reanotes 首页（板块总览仪表盘）
 
 ```
 ├── index.html              # 页面入口（标题、顶栏、板块切换器容器）
+├── content/
+│   └── tabs/
+│       ├── README.md                 # Tab 与磁盘目录映射
+│       └── replearning/              # 顶栏 Tab：表征学习
+│           ├── pages.json            # 板块目录、顺序和卡片排列
+│           └── boards/
+│               └── <board>/*.md      # 各板块卡片正文（唯一内容源）
 ├── css/
 │   └── style.css           # 所有样式（靛青色系 + 侧边栏布局 + 仪表盘/切换器）
-└── js/
+├── js/
     ├── boards-index.js     # 板块索引 BOARDS：决定有哪些板块、顺序、配色
     ├── boards/
-    │   └── replearning.js  # 表征学习板块数据（home / navTree / content）
+    │   ├── replearning.js        # 表征学习导航、首页和装配逻辑
+    │   └── replearning.cards.js  # Markdown 编译生成物，请勿手改
     └── app.js              # 渲染引擎：总览、板块切换、侧栏、卡片折叠、响应式
+└── scripts/
+    ├── build-cards.py      # Markdown → 页面数据编译器
+    └── install-hooks.sh    # 安装仓库内的 pre-commit hook
 ```
 
 ## 如何添加新内容
 
 ### 在已有板块里加页面
 
-所有内容在对应板块的 `js/boards/<boardId>.js`：
+表征学习正文统一编辑 `content/tabs/replearning/`，不要手改生成的
+`js/boards/replearning.cards.js`：
 
-1. 在 `navTree` 数组加入口（叶节点 `{id, icon, label}` 或带 `children` 的父节点；也可用 `{type: 'divider'}` 分隔条）
-2. 在 `content` 对象加对应页面（`title` / `desc` / `cards` 数组）
-3. 卡片 schema：`{icon, title, tags, expanded, body}`，`body` 是内联 HTML 字符串（支持 `nested-list` / `example-box` / `comp-table` / `code-inline` 等自定义类）
-4. 首页 `HOME_GRID` / `HOME_UPDATES` / `HOME_QUICKREF` 是板块首页的独立列表
+1. 找到顶栏 Tab 目录 `content/tabs/replearning/`。
+2. 在 `boards/<board>/` 下新建一张 `.md` 卡片。
+3. 在 `content/tabs/replearning/pages.json` 登记板块和卡片顺序。
+4. 如需新导航入口，再修改 `js/boards/replearning.js` 的 `NAV_TREE`。
+5. 执行 `python3 scripts/build-cards.py` 生成页面数据。
+6. 用 `python3 -m http.server 8000` 本地预览。
 
 例如：
 
-```js
-{
-  icon: '🏛️',
-  title: 'ImageNet 预训练范式',
-  tags: ['经典'],
-  expanded: true,
-  body: `<p>在 ImageNet（1000 类、1400 万张图）上训练……</p>
-  <ul class="nested-list">
-    <li>模型演进：AlexNet → VGG → ……</li>
-  </ul>`
-}
+```markdown
+---
+icon: 🏛️
+title: ImageNet 预训练范式
+tags: [经典]
+expanded: true
+---
+
+在 ImageNet 上训练一个分类网络，去掉最后的分类头，
+把倒数第二层的特征向量当作通用表示。
 ```
 
-正文直接写在 `body` 里（内联 HTML）。卡片内容随 JS 一并发出，无需额外请求，本地双击 `index.html` 也能正常渲染。
+Markdown 支持标题、列表、表格、引用、代码、链接、图片和 KaTeX 公式；复杂表格或布局可直接嵌入 HTML。编译后内容仍随 JS 一并发出，无运行时网络请求。
 
-### 新增一个研究板块
+目前只有“表征学习”完成 Markdown 化；其他三个顶栏 Tab 仍使用各自的
+`js/boards/<tabId>.js`。具体状态见 `content/tabs/README.md`。
 
-1. 复制 `js/boards/replearning.js` 为 `js/boards/<boardId>.js`，把里面 `BOARD_DATA['replearning']` 改为 `BOARD_DATA['<boardId>']`，替换 `home` / `navTree` / `content`
+### 提交前自动编译
+
+首次克隆后执行一次：
+
+```bash
+./scripts/install-hooks.sh
+```
+
+仓库会把 `core.hooksPath` 设置为 `.githooks`。以后提交 Markdown 或编译脚本时，`pre-commit` 会自动：
+
+1. 检查相关文件是否还有未暂存修改；
+2. 运行 `python3 scripts/build-cards.py`；
+3. 暂存 `js/boards/replearning.cards.js`；
+4. 用 `--check` 确认生成物与 Markdown 一致。
+
+也可以手动检查：
+
+```bash
+python3 scripts/build-cards.py --check
+```
+
+### 新增一个顶栏 Tab
+
+1. 复制 `js/boards/replearning.js` 为 `js/boards/<tabId>.js`，把里面 `BOARD_DATA['replearning']` 改为 `BOARD_DATA['<tabId>']`，替换 `home` / `navTree` / `content`
 2. 在 `js/boards-index.js` 的 `BOARDS` 数组加一行：
    ```js
    { id: 'topic-xxx', name: '板块二', icon: '🔬', desc: '一句话描述', accent: '#0f6e56' },
    ```
-3. 在 `index.html` 里 `<script src="js/boards/replearning.js"></script>` 下方加一行 `<script src="js/boards/<boardId>.js"></script>`
-4. 刷新即可，无需构建
+3. 在 `index.html` 里 `<script src="js/boards/replearning.js"></script>` 下方加一行 `<script src="js/boards/<tabId>.js"></script>`
+4. 如果该 Tab 使用 Markdown，再建立 `content/tabs/<tabId>/boards/` 和对应的内容目录，并为它接入编译生成物
 
 ## 设计语言
 

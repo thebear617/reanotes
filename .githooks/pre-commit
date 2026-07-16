@@ -1,0 +1,22 @@
+#!/bin/sh
+set -eu
+
+ROOT=$(git rev-parse --show-toplevel)
+cd "$ROOT"
+
+STAGED=$(git diff --cached --name-only --diff-filter=ACMR -- \
+  content/tabs/replearning scripts/build-cards.py)
+
+if [ -n "$STAGED" ]; then
+  if ! git diff --quiet -- content/tabs/replearning scripts/build-cards.py; then
+    echo "[pre-commit] Markdown 内容或编译脚本还有未暂存修改。" >&2
+    echo "[pre-commit] 请先暂存或舍弃这些修改，避免生成物混入错误版本。" >&2
+    exit 1
+  fi
+
+  echo "[pre-commit] 正在编译表征学习 Markdown…"
+  python3 scripts/build-cards.py
+  git add js/boards/replearning.cards.js
+fi
+
+python3 scripts/build-cards.py --check

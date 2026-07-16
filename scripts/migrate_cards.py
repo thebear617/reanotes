@@ -2,7 +2,7 @@
 """migrate_cards.py — 一次性：把 replearning.js 里的内联 body: HTML 反推成 .md 源文件。
 
 产出：
-    content/replearning/<page>/<slug>.md
+    content/tabs/replearning/boards/<page>/<slug>.md
         文件头 frontmatter（icon/title/tags/expanded），正文为标准 Markdown。
 
 转换规则（覆盖现有卡片用到的全部结构）：
@@ -296,7 +296,14 @@ def migrate(reanotes_root: Path):
             continue
         cards_region = cm.group(1)
 
-        out_dir = reanotes_root / "content" / "replearning" / page
+        out_dir = (
+            reanotes_root
+            / "content"
+            / "tabs"
+            / "replearning"
+            / "boards"
+            / page
+        )
         out_dir.mkdir(parents=True, exist_ok=True)
         used: set[str] = set()
 
@@ -318,7 +325,7 @@ def migrate(reanotes_root: Path):
             print(f"  ✅ {page}/{slug}.md  ({title})")
 
     print(f"\n[migrate] 共生成 {total} 张卡片的 .md 源文件")
-    print(f"[migrate] 输出目录: content/replearning/")
+    print(f"[migrate] 输出目录: content/tabs/replearning/boards/")
 
 
 def main():
