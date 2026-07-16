@@ -14,18 +14,18 @@ dir:
 
 ## 学习范式
 
-- [监督表示学习](supervised/ImageNet%20预训练范式.md)
-- [自监督表示学习](self-supervised/生成式（Generative）.md)
-- [传统无监督表示学习](unsupervised/经典无监督方法.md)
-- [半监督、弱监督表示学习](semi-supervised/半监督核心方法.md)
+- [监督表示学习](supervised/)
+- [自监督表示学习](self-supervised/)
+- [传统无监督表示学习](unsupervised/)
+- [半监督、弱监督表示学习](semi-supervised/)
 
 ## 目标与迁移
 
-- [度量学习](metric/度量学习的核心思想.md)
-- [迁移表示学习](transfer/预训练%20+%20微调范式.md)
-- [多任务表示学习](multitask/多任务学习的核心思想.md)
+- [度量学习](metric/)
+- [迁移表示学习](transfer/)
+- [多任务表示学习](multitask/)
 
 ## 架构与理解
 
-- [架构范式对照](architecture/编码器-解码器家族树.md)
-- [理解笔记](notes/自编码器的本质：信息瓶颈.md)
+- [架构范式对照](architecture/)
+- [理解笔记](notes/)
