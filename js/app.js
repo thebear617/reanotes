@@ -317,6 +317,28 @@
       html += '<div class="article-body">' + page.article + '</div>';
     }
 
+    if (page.timeline) {
+      html += '<div class="timeline">';
+      page.timeline.forEach(function (item, idx) {
+        var isLast = idx === page.timeline.length - 1;
+        html += '<div class="timeline-item">'
+              + '<div class="timeline-marker">'
+              + '<div class="timeline-dot tl-dot-done"></div>'
+              + (isLast ? '' : '<div class="timeline-line"></div>')
+              + '</div>'
+              + '<div class="timeline-card">'
+              + '<div class="timeline-card-top">'
+              + '<span class="timeline-card-title">' + item.title + '</span>'
+              + (item.tags ? item.tags.map(function (t) { return '<span class="tl-tag">' + t + '</span>'; }).join('') : '')
+              + '</div>'
+              + (item.date ? '<div class="tl-date">📅 ' + item.date + '</div>' : '')
+              + '<p class="timeline-card-note">' + item.desc + '</p>'
+              + '</div>'
+              + '</div>';
+      });
+      html += '</div>';
+    }
+
     html += '</div>';
 
     if (page.linkSections) {

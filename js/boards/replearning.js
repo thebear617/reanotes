@@ -2,7 +2,7 @@
 /* ===== 首页数据 ===== */
 const HOME_GRID = [
   { id: 'foundation',       icon: '📜', title: '基础知识',       desc: 'Bengio 定义与十大先验' },
-  { id: 'overview',         icon: '🔭', title: '总体图谱',       desc: '领域总览、三大分类轴' },
+  { id: 'overview',         icon: '🔭', title: '发展史',       desc: '表征学习发展里程碑' },
   { id: 'self-supervised',  icon: '🔄', title: '自监督学习',     desc: '生成式 · 对比式 · 非对比式' },
   { id: 'linear-nonlinear', icon: '⚡', title: '线性 vs 非线性', desc: '核心对照、核技巧、线性探针' },
   { id: 'architecture',     icon: '🏗️', title: '架构范式对照',   desc: 'AE vs U-Net 设计哲学' },
@@ -14,7 +14,7 @@ const HOME_GRID = [
 
 const HOME_UPDATES = [
   { date: '2026-07-11', text: '新增基础知识：Bengio 定义与十大先验', id: 'foundation' },
-  { date: '2026-06-30', text: '创建表征学习理解图谱',          id: 'overview' },
+  { date: '2026-06-30', text: '创建表征学习发展史时间轴',        id: 'overview' },
   { date: '2026-06-30', text: '自监督学习三大范式',            id: 'self-supervised' },
   { date: '2026-06-30', text: '线性 vs 非线性完整对照',        id: 'linear-nonlinear' },
   { date: '2026-06-30', text: '架构范式对照：AE vs U-Net',     id: 'architecture' },
@@ -30,7 +30,7 @@ const HOME_QUICKREF = [
 /* ===== 导航树 ===== */
 const NAV_TREE = [
   { id: 'foundation',  icon: '📜', label: '基础知识' },
-  { id: 'overview',    icon: '🔭', label: '总体图谱' },
+  { id: 'overview',    icon: '🔭', label: '发展史' },
   { id: 'div1',        type: 'divider' },
   {
     id: 'cat-supervision', icon: '📐', label: '按监督信号',
@@ -83,32 +83,58 @@ CONTENT['home'] = {
   quickRef: HOME_QUICKREF,
 };
 
-/* ─── 总体图谱 ─── */
+/* ─── 发展史 ─── */
 CONTENT['overview'] = {
-  title: '🔭 总体图谱',
-  desc: '表示学习（Representation Learning）旨在自动从数据中提取有用的特征表示，是深度学习的核心问题之一。下面按不同视角梳理整个领域。',
-  cards: [
+  title: '🔭 发展史',
+  desc: '表征学习从手工特征到深度自监督的演进。每个节点都是一个重要的转折点或里程碑。',
+  timeline: [
     {
-      icon: '🧠',
-      title: '什么是表示学习？',
-      tags: ['核心理念'],
-      expanded: false,
-      body: `<p>表示学习的核心目标：<strong>将原始数据（像素、文本、图结构）映射到一个语义上有意义的向量空间</strong>，使得在这个空间里，相似的样本距离近，不同的样本距离远，并且下游任务（分类、检测、生成）可以轻松利用这个表示。</p>
-      <p>传统机器学习依赖<strong>手工特征工程</strong>（SIFT、HOG、TF-IDF），而表示学习让模型<strong>自己学会</strong>什么特征是有用的。</p>`
+      date: '2012',
+      title: '表征学习综述 + ICLR 诞生',
+      desc: 'Bengio 发表综述《Representation Learning: A Review and New Perspectives》，提出十大先验框架；同年与 LeCun 创办第一届 ICLR（International Conference on Learning Representations），会议名称直指"表征学习"。',
+      tags: ['奠基', 'Bengio'],
     },
     {
-      icon: '🗺️',
-      title: '领域总览：三大分类轴',
-      tags: ['框架'],
-      expanded: true,
-      body: `<p>表示学习可以从三个维度组织：</p>
-      <ul class="nested-list">
-        <li><strong>按监督信号</strong>：监督、自监督、无监督、半监督——训练时用什么信号驱动？</li>
-        <li><strong>按表示属性</strong>：解耦、稀疏、分层——学到的表示有什么数学性质？</li>
-        <li><strong>按数据形态</strong>：图、多模态、序列——数据本身的格式是什么？</li>
-        <li><strong>按学习目标</strong>：度量、迁移、多任务——为什么要学这个表示？</li>
-      </ul>
-      <p>下面每个页面都是一个轴的具体展开。</p>`
+      date: '2012',
+      title: 'AlexNet — 深度特征工程的开端',
+      desc: 'Krizhevsky, Sutskever, Hinton 的 AlexNet 在 ImageNet 上大幅刷新纪录。虽然本质是监督分类，但它证明深度 CNN 自动学到的中间层特征是极其强大的视觉表示。',
+      tags: ['CV', 'ImageNet'],
+    },
+    {
+      date: '2013',
+      title: 'Word2Vec — 词的分布式表示',
+      desc: 'Mikolov 等人提出 CBOW 和 Skip-gram，将词映射到稠密向量空间。"国王 - 男人 + 女人 ≈ 女王"的类比推理震惊 NLP 界，掀起了分布式表示的研究浪潮。',
+      tags: ['NLP', '分布式'],
+    },
+    {
+      date: '2015',
+      title: 'ResNet — 残差连接让深层网络可用',
+      desc: 'He 等人提出残差学习，解决了深层网络的退化问题。152 层的 ResNet 把 ImageNet 错误率降到 3.57%，其 skip connection 思想影响了后续几乎所有架构设计。',
+      tags: ['CV', '架构'],
+    },
+    {
+      date: '2018',
+      title: 'BERT — 预训练 + 微调范式',
+      desc: 'Devlin 等人提出 BERT，通过掩码语言建模（MLM）在大规模无标注文本上预训练，再在下游任务微调。这一范式迅速统治 NLP，也启发了视觉领域的 MAE 等方法。',
+      tags: ['NLP', '预训练'],
+    },
+    {
+      date: '2020',
+      title: '对比学习爆发：SimCLR / MoCo v2',
+      desc: 'Chen 等人（SimCLR）和 He 等人（MoCo）将对比学习推向自监督视觉的前沿。核心思想简单：同一图片的不同增强在表示空间靠近，不同图片推开。无需负样本的 BYOL 同期出现。',
+      tags: ['自监督', 'CV'],
+    },
+    {
+      date: '2021',
+      title: 'MAE — 掩码自编码器回归',
+      desc: 'He 等人提出 MAE，将 BERT 的掩码思路搬到视觉：遮掉 75% 的 patch，让解码器重建原图。极简的设计、极高的效率，在 ImageNet 上超越对比学习方法。',
+      tags: ['自监督', 'CV'],
+    },
+    {
+      date: '2023',
+      title: 'DINOv2 — 通用视觉特征',
+      desc: 'Meta AI 发布 DINOv2，在 1.42 亿张策划数据集上训练的自蒸馏 ViT。冻结特征可直接用于深度估计、语义分割、图像检索等大量任务，无需微调。标志着通用视觉表示的成熟。',
+      tags: ['自监督', '通用'],
     },
   ]
 };

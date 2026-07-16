@@ -1406,3 +1406,94 @@ button {
 .venue-github svg {
   fill: currentColor;
 }
+
+/* ===== 时间轴（发展史视图） ===== */
+.timeline {
+  position: relative;
+  padding-left: 2.2rem;
+}
+.timeline-item {
+  position: relative;
+  display: flex;
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+}
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+.timeline-marker {
+  position: absolute;
+  left: -2.2rem;
+  top: 0;
+  bottom: 0;
+  width: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.timeline-dot {
+  width: .7rem;
+  height: .7rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: .55rem;
+  z-index: 1;
+}
+.tl-dot-done {
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(79,70,229,.15);
+}
+.timeline-line {
+  flex: 1;
+  width: 1.5px;
+  background: var(--line);
+  margin-top: .35rem;
+}
+.timeline-card {
+  flex: 1;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: .95rem 1rem;
+  box-shadow: var(--shadow);
+  transition: border-color .15s, transform .15s;
+}
+.timeline-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+.timeline-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  margin-bottom: .35rem;
+  flex-wrap: wrap;
+}
+.timeline-card-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--dark);
+}
+.timeline-card-note {
+  color: var(--muted);
+  font-size: .82rem;
+  line-height: 1.55;
+  margin-top: .3rem;
+}
+.tl-tag {
+  display: inline-block;
+  font-size: .68rem;
+  font-weight: 700;
+  padding: .1rem .45rem;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.tl-date {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: .25rem;
+}
