@@ -1,0 +1,14 @@
+node_modules
+dist
+pnpm-lock.yaml
+README.md
+docs/.vuepress/.cache
+docs/.vuepress/.temp
+
+# 迁移期间暂不格式化旧静态站与生成内容
+content
+output
+js
+css
+index.html
+pages.json

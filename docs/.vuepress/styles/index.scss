@@ -1,0 +1,11 @@
+:root {
+  --vp-c-accent: #4f46e5;
+  --vp-c-accent-bg: #4f46e5;
+  --vp-c-accent-hover: #4338ca;
+}
+
+[data-theme="dark"] {
+  --vp-c-accent: #818cf8;
+  --vp-c-accent-bg: #6366f1;
+  --vp-c-accent-hover: #a5b4fc;
+}

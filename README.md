@@ -6,49 +6,55 @@
 
 ## 这是什么？
 
-这是一个**多板块的个人科研笔记站**。首页是板块总览仪表盘，每个板块是一块独立的知识域（例如「表征学习」），内部用可折叠的卡片组织理解脉络。新增研究主题 = 新增一个板块，零侵入。
+这是一个**多板块的个人科研笔记站**。项目正在从原生 JS 卡片站迁移到与 JavaGuide 相同的 VuePress 2 + Vite + Vue 3 + Theme Hope 架构。新内容以 `docs/` 下的 Markdown 为唯一内容源，并按顶栏 Tab 和板块分目录组织。
 
 ## 信息架构
 
 ```
-reanotes 首页（板块总览仪表盘）
-├── 🧠 表征学习   (replearning)   ← 现有全部表征学习内容整体迁入
-├── 📚 板块二      (待添加)
-├── 🔬 板块三      (待添加)
-└── …… 后续任意新增
+ReaNotes
+├── 表征学习       /replearning/
+├── 深度学习项目   /dlproject/
+├── 深度学习研究   /dlresearch/
+└── 文献库         /literature/
 ```
 
-- **首页（总览）**：列出所有板块卡片，点击进入
-- **进入某板块后**：顶栏板块切换器可一点换板块；左侧是该板块自己的导航；面包屑「🏠 首页」回到该板块首页；点顶栏站名「reanotes」回到总览
-- **路由**：用 URL hash，`#replearning` 进板块首页，`#replearning/self-supervised` 直接定位某页，空 hash 为总览
+- **首页**：四个研究 Tab 的入口。
+- **顶栏**：用于切换研究 Tab。
+- **侧栏**：每个 Tab 拥有独立的板块和 Markdown 文档树。
+- **路由**：使用真实路径，例如 `/replearning/foundation/linear-vs-nonlinear.html`。
 
 ## 文件结构
 
 ```
-├── index.html              # 页面入口（标题、顶栏、板块切换器容器）
-├── content/
-│   └── tabs/
-│       ├── README.md                 # Tab 与磁盘目录映射
-│       └── replearning/              # 顶栏 Tab：表征学习
-│           ├── pages.json            # 板块目录、顺序和卡片排列
-│           └── boards/
-│               └── <board>/*.md      # 各板块卡片正文（唯一内容源）
-├── css/
-│   └── style.css           # 所有样式（靛青色系 + 侧边栏布局 + 仪表盘/切换器）
-├── js/
-    ├── boards-index.js     # 板块索引 BOARDS：决定有哪些板块、顺序、配色
-    ├── boards/
-    │   ├── replearning.js        # 表征学习导航、首页和装配逻辑
-    │   └── replearning.cards.js  # Markdown 编译生成物，请勿手改
-    └── app.js              # 渲染引擎：总览、板块切换、侧栏、卡片折叠、响应式
-└── scripts/
-    ├── build-cards.py      # Markdown → 页面数据编译器
-    └── install-hooks.sh    # 安装仓库内的 pre-commit hook
+├── docs/                         # 新站 Markdown 内容源
+│   ├── .vuepress/
+│   │   ├── config.ts             # VuePress 与 Vite 配置
+│   │   ├── navbar.ts             # 顶栏 Tab
+│   │   ├── sidebar/              # 各 Tab 的侧栏配置
+│   │   └── theme.ts              # Theme Hope 配置
+│   ├── replearning/
+│   ├── dlproject/
+│   ├── dlresearch/
+│   └── literature/
+├── package.json                  # pnpm 命令和依赖
+├── .husky/pre-commit             # 提交前检查
+├── .github/workflows/test.yml    # CI 构建验证
+├── index.html                    # 迁移期间保留的旧站入口
+├── content/                      # 旧站 Markdown 内容源，待逐步迁移
+├── js/                           # 旧站数据和渲染代码，待切换后移除
+└── scripts/build-cards.py        # 旧站内容编译器，迁移期间继续校验
 ```
 
 ## 如何添加新内容
 
-### 在已有板块里加页面
+### 在新站里加页面
+
+1. 在 `docs/<tab>/<board>/` 下新建 Markdown 文件。
+2. 在 `docs/.vuepress/sidebar/` 对应的侧栏文件中登记页面。
+3. 执行 `pnpm dev` 本地编辑和预览。
+4. 提交前执行 `pnpm lint && pnpm build`。
+
+### 旧站内容
 
 表征学习正文统一编辑 `content/tabs/replearning/`，不要手改生成的
 `js/boards/replearning.cards.js`：
@@ -87,12 +93,11 @@ Markdown 支持标题、列表、表格、引用、代码、链接、图片和 K
 ./scripts/install-hooks.sh
 ```
 
-仓库会把 `core.hooksPath` 设置为 `.githooks`。以后提交 Markdown 或编译脚本时，`pre-commit` 会自动：
+依赖安装时 Husky 会把 `core.hooksPath` 设置为 `.husky/_`。以后提交时，`pre-commit` 会自动：
 
-1. 检查相关文件是否还有未暂存修改；
-2. 运行 `python3 scripts/build-cards.py`；
-3. 暂存 `js/boards/replearning.cards.js`；
-4. 用 `--check` 确认生成物与 Markdown 一致。
+1. 用 `python3 scripts/build-cards.py --check` 确认旧站生成物仍与内容源一致；
+2. 用 Prettier 格式化暂存文件；
+3. 用 markdownlint 检查暂存的 Markdown。
 
 也可以手动检查：
 

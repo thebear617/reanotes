@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="ReaNotes logo">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#818cf8"/>
+      <stop offset="1" stop-color="#4338ca"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#g)"/>
+  <path d="M34 30h38c15 0 25 9 25 22 0 10-6 17-15 20l19 26H80L64 75H53v23H34V30Zm19 16v14h17c5 0 8-3 8-7s-3-7-8-7H53Z" fill="#fff"/>
+</svg>
