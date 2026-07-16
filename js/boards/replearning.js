@@ -149,14 +149,21 @@ CONTENT['supervised'] = {
       title: 'ImageNet 预训练范式',
       tags: ['经典'],
       expanded: true,
-      markdown: 'content/replearning/supervised/imagenet.md'
+      body: `<p>在 ImageNet（1000 类、1400 万张图）上训练一个分类网络，训练完成后，<strong>去掉最后的分类头，把倒数第二层的特征向量当作通用表示</strong>。</p>
+      <p>这个范式统治了 CV 领域近十年（2012–2020）：</p>
+      <ul class="nested-list">
+        <li>模型演进：AlexNet → VGG → Inception → ResNet → EfficientNet → ViT</li>
+        <li>在任意下游任务上，冻结特征 + 线性分类器，就能取得远好于手工特征的效果</li>
+        <li>缺点是需要<strong>大量标注数据</strong>，且学到的表示可能过拟合到 ImageNet 的类别分布</li>
+      </ul>`
     },
     {
       icon: '⚖️',
       title: '监督表示的特性',
       tags: ['理解'],
       expanded: false,
-      markdown: 'content/replearning/supervised/properties.md'
+      body: `<p>监督信号驱动的表示有一个隐含假设：<strong>分类任务需要的特征也是其他任务需要的特征</strong>。这在很多时候成立（物体的边缘、纹理、形状是通用的），但并非总是成立。</p>
+      <p>例如 ImageNet 预训练的特征在医学影像、卫星图上效果明显下降——因为监督信号"偏置"了表示去关注对 1000 类分类有用的特征，而不是通用的视觉特征。</p>`
     },
   ]
 };

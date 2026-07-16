@@ -36,65 +36,6 @@
     }
   }
 
-  function loadMarkdownCards(root) {
-    if (!root) return;
-    root.querySelectorAll('[data-markdown-source]').forEach(async function (target) {
-      const source = target.dataset.markdownSource;
-      // 显式相对于当前文档解析路径，避免 hash 路由或 base 标签带来的歧义
-      const resolvedUrl = new URL(source, document.baseURI).href;
-
-      try {
-        if (!window.marked || !window.marked.parse) {
-          throw new Error('Markdown parser is unavailable');
-        }
-        if (window.location.protocol === 'file:') {
-          throw new Error('file protocol');
-        }
-
-        const response = await fetch(resolvedUrl);
-        if (!response.ok) throw new Error('HTTP ' + response.status);
-        const markdown = await response.text();
-        if (!target.isConnected) return;
-
-        target.innerHTML = window.marked.parse(markdown, {
-          gfm: true,
-          breaks: false,
-        });
-        target.classList.remove('markdown-loading');
-        target.classList.add('markdown-loaded');
-
-        target.querySelectorAll('a[href]').forEach(function (link) {
-          if (/^https?:\/\//.test(link.href)) {
-            link.target = '_blank';
-            link.rel = 'noopener';
-          }
-        });
-        renderMath(target);
-
-        const card = target.closest('.card');
-        if (card && !card.classList.contains('collapsed')) {
-          const body = card.querySelector('.card-body');
-          if (body) body.style.maxHeight = (target.scrollHeight + 40) + 'px';
-        }
-      } catch (e) {
-        if (!target.isConnected) return;
-        target.classList.remove('markdown-loading');
-        target.classList.add('markdown-error');
-
-        let message = 'Markdown 加载失败：' + source;
-        if (window.location.protocol === 'file:') {
-          message = '⚠️ 当前通过 file:// 打开页面，无法加载本地 Markdown。请先在 reanotes/ 目录执行：python3 -m http.server 8000';
-        } else if (e.message && e.message.startsWith('HTTP ')) {
-          message = 'Markdown 加载失败（' + e.message + '）：' + source;
-        } else if (e.message === 'Markdown parser is unavailable') {
-          message = 'Markdown 解析器未加载：' + source;
-        }
-        target.textContent = message;
-        console.error('Failed to load markdown:', resolvedUrl, e);
-      }
-    });
-  }
-
   function updateTopBar(board) {
     topEyebrow.textContent = 'reanotes';
     topTitle.textContent = board ? board.name : '科研笔记';
@@ -372,9 +313,7 @@
       page.cards.forEach((card, idx) => {
         const cardId = 'card-' + id + '-' + idx;
         const collapsed = card.expanded ? '' : 'collapsed';
-        const cardBody = card.markdown
-          ? `<div class="card-inner markdown-card markdown-loading" data-markdown-source="${card.markdown}"><p>正在加载 Markdown…</p></div>`
-          : `<div class="card-inner">${card.body || ''}</div>`;
+        const cardBody = `<div class="card-inner">${card.body || ''}</div>`;
         html += `
           <div class="card ${collapsed}" id="${cardId}">
             <div class="card-header" data-card="${cardId}">
@@ -486,7 +425,6 @@
     contentArea.innerHTML = html;
 
     renderMath(contentArea);
-    loadMarkdownCards(contentArea);
 
     // 时间轴折叠
     document.querySelectorAll('.tl-card-header').forEach(function (header) {
