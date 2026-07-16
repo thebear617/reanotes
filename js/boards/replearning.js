@@ -35,10 +35,10 @@ const NAV_TREE = [
   {
     id: 'cat-supervision', icon: '📐', label: '按监督信号',
     children: [
+      { id: 'unsupervised',      label: '传统无监督表示学习' },
       { id: 'supervised',        label: '监督表示学习' },
       { id: 'self-supervised',   label: '自监督表示学习' },
-      { id: 'unsupervised',      label: '无监督表示学习' },
-      { id: 'semi-supervised',   label: '弱监督 / 半监督' },
+      { id: 'semi-supervised',   label: '半监督、弱监督表示学习' },
     ]
   },
   {
@@ -241,7 +241,7 @@ CONTENT['self-supervised'] = {
 
 /* ─── 无监督表示学习 ─── */
 CONTENT['unsupervised'] = {
-  title: '📐 无监督表示学习',
+  title: '📐 传统无监督表示学习',
   desc: '完全不依赖标签，只利用数据本身的统计分布来学习表示。在深度流行之前，这是表示学习的主要形式。',
   cards: [
     {
@@ -278,7 +278,7 @@ CONTENT['unsupervised'] = {
 
 /* ─── 弱监督 / 半监督 ─── */
 CONTENT['semi-supervised'] = {
-  title: '📐 弱监督 / 半监督表示学习',
+  title: '📐 半监督、弱监督表示学习',
   desc: '在只有少量标签 + 大量无标签数据的场景下学习表示。这种设置更贴近现实——标注成本高，但原始数据很便宜。',
   cards: [
     {
