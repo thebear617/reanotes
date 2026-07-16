@@ -1,7 +1,7 @@
 (function () {
 /* ===== 首页数据 ===== */
 const HOME_GRID = [
-  { id: 'foundation',       icon: '📜', title: '理论基底',       desc: 'Bengio 定义与十大先验' },
+  { id: 'foundation',       icon: '📜', title: '基础知识',       desc: 'Bengio 定义与十大先验' },
   { id: 'overview',         icon: '🔭', title: '总体图谱',       desc: '领域总览、三大分类轴' },
   { id: 'self-supervised',  icon: '🔄', title: '自监督学习',     desc: '生成式 · 对比式 · 非对比式' },
   { id: 'linear-nonlinear', icon: '⚡', title: '线性 vs 非线性', desc: '核心对照、核技巧、线性探针' },
@@ -13,7 +13,7 @@ const HOME_GRID = [
 ];
 
 const HOME_UPDATES = [
-  { date: '2026-07-11', text: '新增理论基底：Bengio 定义与十大先验', id: 'foundation' },
+  { date: '2026-07-11', text: '新增基础知识：Bengio 定义与十大先验', id: 'foundation' },
   { date: '2026-06-30', text: '创建表征学习理解图谱',          id: 'overview' },
   { date: '2026-06-30', text: '自监督学习三大范式',            id: 'self-supervised' },
   { date: '2026-06-30', text: '线性 vs 非线性完整对照',        id: 'linear-nonlinear' },
@@ -29,7 +29,7 @@ const HOME_QUICKREF = [
 
 /* ===== 导航树 ===== */
 const NAV_TREE = [
-  { id: 'foundation',  icon: '📜', label: '理论基底' },
+  { id: 'foundation',  icon: '📜', label: '基础知识' },
   { id: 'overview',    icon: '🔭', label: '总体图谱' },
   { id: 'div1',        type: 'divider' },
   {
@@ -763,11 +763,53 @@ CONTENT['notes'] = {
   ]
 };
 
-/* ─── 理论基底 ─── */
+/* ─── 基础知识 ─── */
 CONTENT['foundation'] = {
-  title: '📜 理论基底',
+  title: '📜 基础知识',
   desc: '表征学习为什么重要、Bengio 如何定义它、以及支撑整个领域的十大先验（prior）。这是后续所有分类轴的"元框架"。',
   cards: [
+    {
+      icon: '🧭',
+      title: '表征学习-数学模型和研究目的',
+      tags: ['起点'],
+      expanded: true,
+      body: `<h3>一、先理解表征学习到底在研究什么</h3>
+      <p>可以先把所有模型抽象成：</p>
+      <p style="text-align: center; font-size: 1.1em;">$x \\xrightarrow{f_\\theta} z \\xrightarrow{g_\\phi} y$</p>
+      <p>其中：</p>
+      <ul class="nested-list">
+        <li>$x$：原始数据，例如图像、文本、语音；</li>
+        <li>$f_\\theta$：编码器；</li>
+        <li>$z$：学习到的特征；</li>
+        <li>$g_\\phi$：分类头、生成器、检索器或者决策模块；</li>
+        <li>$y$：最终输出。</li>
+      </ul>
+      <p>表征学习真正关心的不是"用了什么网络"，而是：</p>
+      <blockquote>表征 = 保留了输入中的什么信息，舍弃了什么信息，以及这种信息组织方式能否迁移到新的任务。</blockquote>
+      <p>经典的表征学习综述把这个问题描述为：数据背后存在若干解释性变化因素，而不同表示会以不同程度把这些因素纠缠或者分离。<a href="https://arxiv.org/abs/1206.5538" target="_blank" rel="noopener">× arXiv</a></p>
+      <p>例如一张猫的照片包含：</p>
+      <div class="example-box">
+        <div class="example-box-title">🐱 猫的图片属性示例</div>
+        <pre>动物类别：猫
+姿态：趴着
+颜色：橘色
+背景：沙发
+光照：较暗
+拍摄角度：侧面
+纹理、像素噪声……</pre>
+      </div>
+      <p>对于猫分类来说，理想表征应该：</p>
+      <ul class="nested-list">
+        <li>保留"猫"的语义；</li>
+        <li>对轻微光照变化保持稳定；</li>
+        <li>对背景变化不过度敏感；</li>
+        <li>可能保留姿态，但不一定依赖姿态；</li>
+        <li>丢弃无意义的传感器噪声。</li>
+      </ul>
+      <p>但对于姿态估计任务，姿态又必须被保留。</p>
+      <p>所以没有脱离任务和环境的"绝对好表征"。更准确的问题是：</p>
+      <blockquote>对于哪些任务、哪些变化、哪些数据分布，这个表征是好的？</blockquote>`
+    },
     {
       icon: '🤔',
       title: '为什么要表征学习？',
