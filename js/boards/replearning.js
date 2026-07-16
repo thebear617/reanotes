@@ -811,33 +811,6 @@ CONTENT['foundation'] = {
       <blockquote>对于哪些任务、哪些变化、哪些数据分布，这个表征是好的？</blockquote>`
     },
     {
-      icon: '🤔',
-      title: '为什么要表征学习？',
-      tags: ['动机'],
-      expanded: true,
-      body: `<p>机器学习的成败，不仅取决于算法，也取决于<strong>数据的表示（representation）</strong>。表示选得好，有效信息被暴露；选得差，有效信息被隐藏。</p>
-      <ul class="nested-list">
-        <li><strong>特征工程</strong>：靠人工经验设计特征——数据量小、先验明确时高效</li>
-        <li><strong>表征学习</strong>：让算法自动从大量复杂数据中提取特征——数据量大且复杂时必需</li>
-      </ul>
-      <p>一个核心动机：人类只需<strong>少量样本</strong>就能区分猫狗，机器却要海量数据。差异在于<strong>大脑如何对数据编码、如何存储知识</strong>——这正是表征学习想破解的目标。</p>
-      <p>2013 年第一届 ICLR，Bengio 与 LeCun 创办会议，主张"机器学习效果高度依赖数据表示的选择"；同年 Bengio 发表表征学习综述 <em>Representation Learning: A Review and New Perspectives</em>。</p>`
-    },
-    {
-      icon: '📐',
-      title: 'Bengio 的定义',
-      tags: ['定义'],
-      expanded: true,
-      body: `<blockquote style="border-left:3px solid var(--accent);padding:.5rem 1rem;color:var(--muted);background:var(--accent-bg);border-radius:0 8px 8px 0;margin:.4rem 0;font-style:italic">
-        learning representations of the data that make it easier to extract useful information when building classifiers or other predictors
-      </blockquote>
-      <p>两点关键推论：</p>
-      <ul class="nested-list">
-        <li><strong>表征不能孤立评价</strong>：一个表征"好不好"，必须结合最终下游任务（分类/回归/检测）来看——隔了分类器，难以客观度量。</li>
-        <li><strong>目标是解耦解释因子</strong>：Bengio 指出，好的表征应当"识别并解耦隐藏在低层感知数据背后的底层解释性因子（explanatory factors）"。</li>
-      </ul>`
-    },
-    {
       icon: '🧬',
       title: '十大先验（Bengio 的 priors）',
       tags: ['框架', '总纲'],
