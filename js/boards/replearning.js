@@ -8,7 +8,6 @@ const HOME_GRID = [
   { id: 'architecture',     icon: '🏗️', title: '架构范式对照',   desc: 'AE vs U-Net 设计哲学' },
   { id: 'notes',            icon: '📝', title: '理解笔记',       desc: '关键洞察和核心速记' },
   { id: 'supervised',       icon: '🏛️', title: '监督表示学习',   desc: 'ImageNet 预训练、线性探针' },
-  { id: 'graph',            icon: '🕸️', title: '图表示学习',     desc: 'GCN、Node2Vec、图自编码器' },
   { id: 'metric',           icon: '📏', title: '度量学习',       desc: 'Triplet Loss、ArcFace' },
 ];
 
@@ -39,14 +38,6 @@ const NAV_TREE = [
       { id: 'supervised',        label: '监督表示学习' },
       { id: 'self-supervised',   label: '自监督表示学习' },
       { id: 'semi-supervised',   label: '半监督、弱监督表示学习' },
-    ]
-  },
-  {
-    id: 'cat-modality', icon: '📦', label: '按数据形态',
-    children: [
-      { id: 'graph',        label: '图表示学习' },
-      { id: 'multimodal',   label: '多模态表示学习' },
-      { id: 'sequence',     label: '序列表示学习' },
     ]
   },
   {
@@ -285,103 +276,6 @@ CONTENT['semi-supervised'] = {
         <li><strong>Noisy Student</strong>：用噪声注入训练学生模型，让学生超越老师</li>
       </ul>
       <p>本质上，半监督 = <strong>无监督/自监督的信号 + 少量监督信号的联合驱动</strong>。</p>`
-    },
-  ]
-};
-
-/* ─── 图表示学习 ─── */
-CONTENT['graph'] = {
-  title: '📦 图表示学习',
-  desc: '将图结构数据（节点、边、子图）映射到低维向量空间，同时保留图的拓扑结构和属性信息。',
-  cards: [
-    {
-      icon: '🕸️',
-      title: '图表示学习的核心问题',
-      tags: ['理念'],
-      expanded: true,
-      body: `<p>图数据有三个核心挑战：</p>
-      <ul class="nested-list">
-        <li><strong>非欧空间</strong>：图没有规则的网格结构（不像图像），不能用卷积核直接滑动</li>
-        <li><strong>拓扑不变性</strong>：图的排列（permutation）不应该改变表示——需要置换不变性</li>
-        <li><strong>多尺度</strong>：节点级、边级、子图级、全图级，每个粒度都需要不同的表示</li>
-      </ul>`
-    },
-    {
-      icon: '🧩',
-      title: '代表方法',
-      tags: ['方法'],
-      expanded: false,
-      body: `<ul class="nested-list">
-        <li><strong>Node2Vec / DeepWalk</strong>：基于随机游走的图嵌入（无监督、浅层）</li>
-        <li><strong>GCN（图卷积网络）</strong>：在邻域上做卷积操作，聚合邻居信息</li>
-        <li><strong>GAT（图注意力网络）</strong>：用注意力机制动态聚合邻居，自适应权重</li>
-        <li><strong>GraphSAGE</strong>：采样邻居 + 聚合，适应大规模图</li>
-        <li><strong>图自编码器（GAE / VGAE）</strong>：用自编码器框架重构图结构或节点属性</li>
-      </ul>`
-    },
-  ]
-};
-
-/* ─── 多模态表示学习 ─── */
-CONTENT['multimodal'] = {
-  title: '📦 多模态表示学习',
-  desc: '把不同模态（文本、图像、音频、视频等）的数据映射到同一个语义空间中，实现跨模态的对齐与理解。',
-  cards: [
-    {
-      icon: '🌉',
-      title: '多模态表示的核心思想',
-      tags: ['理念'],
-      expanded: true,
-      body: `<p>核心目标：让"猫"这个词、猫的照片、猫的叫声在表示空间中<strong>互相对齐</strong>。</p>
-      <ul class="nested-list">
-        <li><strong>共享语义空间</strong>：不同模态编码到同一空间，语义相近的样本距离近</li>
-        <li><strong>零样本迁移</strong>：在一个模态上学到的概念可以迁移到另一个模态</li>
-        <li><strong>跨模态检索</strong>：用文字搜图片、用图片搜文字、用声音搜图片……</li>
-      </ul>`
-    },
-    {
-      icon: '🎯',
-      title: '代表方法',
-      tags: ['方法'],
-      expanded: false,
-      body: `<ul class="nested-list">
-        <li><strong>CLIP</strong>：4 亿图文对的对比学习，图文编码器各自独立，用对比损失拉近配对的图文对</li>
-        <li><strong>ALIGN</strong>：用噪点更强的图文数据（10 亿对），但方法更简单</li>
-        <li><strong>ImageBind</strong>：绑定 6 种模态（图、文、音、热感、深度、IMU）到一个空间</li>
-        <li><strong>GPT-4V / Gemini</strong>：多模态大模型，端到端理解图文混合输入</li>
-      </ul>`
-    },
-  ]
-};
-
-/* ─── 序列表示学习 ─── */
-CONTENT['sequence'] = {
-  title: '📦 序列表示学习',
-  desc: '为时序数据、文本、音频等序列结构学习表示，核心挑战是捕获长程依赖和上下文信息。',
-  cards: [
-    {
-      icon: '⏳',
-      title: '序列表示的核心挑战',
-      tags: ['理念'],
-      expanded: true,
-      body: `<ul class="nested-list">
-        <li><strong>变长输入</strong>：序列长度不定，表示需要压缩到固定维度</li>
-        <li><strong>长程依赖</strong>：序列远端元素之间的依赖关系（例：句子开头的词影响句尾的时态）</li>
-        <li><strong>位置编码</strong>：同一个词在句首和句尾含义不同，需要位置信息</li>
-      </ul>`
-    },
-    {
-      icon: '🔤',
-      title: '代表方法',
-      tags: ['方法'],
-      expanded: false,
-      body: `<ul class="nested-list">
-        <li><strong>LSTM / GRU</strong>：门控循环网络，通过门控机制缓解长程梯度消失</li>
-        <li><strong>Transformer</strong>：自注意力机制，直接建模任意位置的依赖关系，位置编码替代顺序</li>
-        <li><strong>BERT</strong>：双向 Transformer + 掩码语言建模，学到的上下文表示可用于多种 NLP 任务</li>
-        <li><strong>GPT</strong>：单向 Transformer + 自回归预测，学到的表示适合生成任务</li>
-        <li><strong>RNN 自编码器</strong>：用 LSTM/GRU 做编码器解码器，适合序列到序列的重构和翻译</li>
-      </ul>`
     },
   ]
 };
