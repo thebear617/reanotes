@@ -320,19 +320,27 @@
     if (page.timeline) {
       html += '<div class="timeline">';
       page.timeline.forEach(function (item, idx) {
+        var tlId = 'tl-' + idx;
         var isLast = idx === page.timeline.length - 1;
-        html += '<div class="timeline-item">'
+        var expanded = idx === 0;  // 第一个默认展开
+        html += '<div class="tl-item' + (expanded ? ' expanded' : ' collapsed') + '" id="' + tlId + '">'
               + '<div class="timeline-marker">'
               + '<div class="timeline-dot tl-dot-done"></div>'
               + (isLast ? '' : '<div class="timeline-line"></div>')
               + '</div>'
-              + '<div class="timeline-card">'
-              + '<div class="timeline-card-top">'
-              + '<span class="timeline-card-title">' + item.title + '</span>'
-              + (item.tags ? item.tags.map(function (t) { return '<span class="tl-tag">' + t + '</span>'; }).join('') : '')
+              + '<div class="tl-card">'
+              + '<div class="tl-card-header" data-tl="' + tlId + '">'
+              + '<span class="tl-date">📅 ' + item.date + '</span>'
+              + '<span class="tl-title">' + item.title + '</span>'
+              + (item.tags ? '<span class="tl-tags">' + item.tags.map(function (t) { return '<span class="tl-tag">' + t + '</span>'; }).join('') + '</span>' : '')
+              + '<span class="tl-arrow">▶</span>'
               + '</div>'
-              + (item.date ? '<div class="tl-date">📅 ' + item.date + '</div>' : '')
-              + '<p class="timeline-card-note">' + item.desc + '</p>'
+              + '<div class="tl-card-body" style="max-height:' + (expanded ? '2000px' : '0') + '">'
+              + '<div class="tl-card-inner">'
+              + '<p>' + item.desc + '</p>'
+              + (item.link ? '<a class="tl-ref" href="' + item.link + '" target="_blank" rel="noopener">📄 原始论文 →</a>' : '')
+              + '</div>'
+              + '</div>'
               + '</div>'
               + '</div>';
       });
@@ -419,6 +427,26 @@
         console.warn('KaTeX render failed:', e);
       }
     }
+
+    // 时间轴折叠
+    document.querySelectorAll('.tl-card-header').forEach(function (header) {
+      header.addEventListener('click', function () {
+        var item = this.closest('.tl-item');
+        if (!item) return;
+        var body = item.querySelector('.tl-card-body');
+        var isExpanded = item.classList.contains('expanded');
+        if (isExpanded) {
+          item.classList.remove('expanded');
+          item.classList.add('collapsed');
+          body.style.maxHeight = '0';
+        } else {
+          item.classList.add('expanded');
+          item.classList.remove('collapsed');
+          var inner = body.querySelector('.tl-card-inner');
+          body.style.maxHeight = (inner ? inner.scrollHeight + 40 : 2000) + 'px';
+        }
+      });
+    });
 
     // GitHub 图标点击（阻止冒泡，单独打开）
     document.querySelectorAll('.venue-github').forEach(icon => {

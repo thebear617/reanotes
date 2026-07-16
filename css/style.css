@@ -1449,51 +1449,89 @@ button {
   background: var(--line);
   margin-top: .35rem;
 }
-.timeline-card {
+
+/* ===== 时间轴折叠卡片 ===== */
+.tl-item .timeline-marker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tl-card {
   flex: 1;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
-  padding: .95rem 1rem;
   box-shadow: var(--shadow);
-  transition: border-color .15s, transform .15s;
+  overflow: hidden;
+  transition: border-color .15s;
 }
-.timeline-card:hover {
+.tl-item.expanded .tl-card {
   border-color: var(--accent);
-  transform: translateY(-1px);
 }
-.timeline-card-top {
+.tl-card-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: .5rem;
-  margin-bottom: .35rem;
+  gap: .6rem;
+  padding: .75rem 1rem;
+  cursor: pointer;
+  user-select: none;
   flex-wrap: wrap;
 }
-.timeline-card-title {
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--dark);
-}
-.timeline-card-note {
-  color: var(--muted);
-  font-size: .82rem;
-  line-height: 1.55;
-  margin-top: .3rem;
-}
-.tl-tag {
-  display: inline-block;
-  font-size: .68rem;
-  font-weight: 700;
-  padding: .1rem .45rem;
-  border-radius: 999px;
+.tl-card-header:hover {
   background: var(--accent-bg);
-  color: var(--accent);
-  flex-shrink: 0;
 }
 .tl-date {
+  font-size: .76rem;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.tl-title {
+  font-size: .95rem;
+  font-weight: 800;
+  color: var(--dark);
+  flex: 1;
+  min-width: 0;
+}
+.tl-tags {
+  display: flex;
+  gap: .35rem;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.tl-arrow {
+  font-size: .7rem;
+  color: var(--muted);
+  transition: transform .2s;
+  flex-shrink: 0;
+}
+.tl-item.expanded .tl-arrow {
+  transform: rotate(90deg);
+}
+.tl-card-body {
+  overflow: hidden;
+  transition: max-height .25s ease;
+}
+.tl-card-inner {
+  padding: 0 1rem 1rem 1rem;
+  font-size: .84rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.tl-ref {
+  display: inline-block;
+  margin-top: .5rem;
   font-size: .78rem;
   font-weight: 600;
-  color: var(--muted);
-  margin-bottom: .25rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+.tl-ref:hover {
+  text-decoration: underline;
 }
