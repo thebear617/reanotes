@@ -42,14 +42,6 @@ const NAV_TREE = [
     ]
   },
   {
-    id: 'cat-property', icon: '🧬', label: '按表示属性',
-    children: [
-      { id: 'disentangled', label: '解耦表示学习' },
-      { id: 'sparse',       label: '稀疏表示学习' },
-      { id: 'hierarchical', label: '分层表示学习' },
-    ]
-  },
-  {
     id: 'cat-modality', icon: '📦', label: '按数据形态',
     children: [
       { id: 'graph',        label: '图表示学习' },
@@ -293,113 +285,6 @@ CONTENT['semi-supervised'] = {
         <li><strong>Noisy Student</strong>：用噪声注入训练学生模型，让学生超越老师</li>
       </ul>
       <p>本质上，半监督 = <strong>无监督/自监督的信号 + 少量监督信号的联合驱动</strong>。</p>`
-    },
-  ]
-};
-
-/* ─── 解耦表示学习 ─── */
-CONTENT['disentangled'] = {
-  title: '🧬 解耦表示学习',
-  desc: '追求潜在空间的每个维度独立对应一个可解释的语义因子——例如形状、颜色、姿态、背景等互不纠缠。',
-  cards: [
-    {
-      icon: '🧵',
-      title: '解耦的核心思想',
-      tags: ['理念'],
-      expanded: true,
-      body: `<p>解耦（Disentanglement）追求的一种理想状态：</p>
-      <ul class="nested-list">
-        <li>改变潜在空间的一个维度 → 输出的<strong>一个</strong>语义属性变化，其他不变</li>
-        <li>例如：z₁ 控制旋转、z₂ 控制颜色、z₃ 控制背景——互不干扰</li>
-        <li>这使得表示<strong>可解释、可编辑、可组合</strong></li>
-      </ul>
-      <div class="example-box">
-        <div class="example-box-title">💡 理解要点</div>
-        <p>解耦是自编码器"信息瓶颈"哲学的极致延伸——既然要把信息压缩到瓶颈，不如强迫每个维度各管一摊。但问题在于：<strong>什么算"一个语义因子"？</strong>这本身是主观的。</p>
-      </div>`
-    },
-    {
-      icon: '🔬',
-      title: '代表方法',
-      tags: ['方法'],
-      expanded: false,
-      body: `<ul class="nested-list">
-        <li><strong>β-VAE</strong>：在 VAE 的 KL 散度项前加一个权重 β > 1，更强力地约束潜在分布，从而促进解耦</li>
-        <li><strong>FactorVAE</strong>：在 β-VAE 基础上加一个判别器，鼓励每个维度独立</li>
-        <li><strong>DIP-VAE</strong>：直接约束潜在表示的协方差矩阵</li>
-        <li><strong>InfoGAN</strong>：在 GAN 中通过互信息最大化实现解耦</li>
-      </ul>`
-    },
-  ]
-};
-
-/* ─── 稀疏表示学习 ─── */
-CONTENT['sparse'] = {
-  title: '🧬 稀疏表示学习',
-  desc: '追求表示向量的大多数元素为 0，只有少数维度被激活。这既有利于可解释性，也有计算优势。',
-  cards: [
-    {
-      icon: '🌵',
-      title: '稀疏表示的核心思想',
-      tags: ['理念'],
-      expanded: true,
-      body: `<p>认知科学启示：大脑中只有约 1-4% 的神经元同时活跃。稀疏表示追求类似的效果：</p>
-      <ul class="nested-list">
-        <li>每个输入只激活潜在空间中的<strong>一小部分维度</strong></li>
-        <li>被激活的维度具有<strong>高度的选择性</strong>（每个维度只对特定的输入模式响应）</li>
-        <li>稀疏性提升了<strong>可解释性</strong>——你可以直接看出是哪些特征被激活了</li>
-      </ul>
-      <p>数学上通过在损失函数中加入 L1 正则化（或 KL 散度约束）来实现：</p>
-      <p>$$\mathcal{L} = \|X - X'\|^2 + \lambda \sum_j |z_j|$$</p>`
-    },
-    {
-      icon: '📚',
-      title: '代表方法',
-      tags: ['方法'],
-      expanded: false,
-      body: `<ul class="nested-list">
-        <li><strong>稀疏自编码器（SAE）</strong>：在 AE 的瓶颈层加稀疏约束，让潜在表示大多数维接近 0</li>
-        <li><strong>LASSO 回归</strong>：线性模型 + L1 正则化，本质上是稀疏线性表示</li>
-        <li><strong>字典学习（Dictionary Learning）</strong>：学习一组过完备基，每个样本只用少数基的线性组合表示</li>
-        <li><strong>Sparse Coding</strong>：神经科学启发的无监督方法，每个图像 patch 用少数基原子编码</li>
-      </ul>`
-    },
-  ]
-};
-
-/* ─── 分层表示学习 ─── */
-CONTENT['hierarchical'] = {
-  title: '🧬 分层表示学习',
-  desc: '表示有层次结构——低层捕获低级特征（边缘、纹理），高层捕获语义概念（物体、场景）。这是深度学习的本质优势。',
-  cards: [
-    {
-      icon: '🏗️',
-      title: '分层表示的核心思想',
-      tags: ['理念'],
-      expanded: true,
-      body: `<p>深度神经网络之所以"深"，核心目的就是学到一个<strong>层次化的表示</strong>：</p>
-      <ul class="nested-list">
-        <li><strong>第一层</strong>：边缘、角点、颜色块（Gabor 滤波器类似）</li>
-        <li><strong>中间层</strong>：纹理模式、局部形状（眼睛、轮子、窗户）</li>
-        <li><strong>高层</strong>：完整的语义概念（人脸、汽车、建筑）</li>
-      </ul>
-      <p>每一层都是对上一层特征的<strong>组合与抽象</strong>——这正是深度学习的"深度"二字的含义。</p>
-      <div class="example-box">
-        <div class="example-box-title">💡 理解要点</div>
-        <p>分层表示不是某个特定方法的专利——<strong>任何足够深的神经网络都会自发形成层次表示</strong>，前提是有合适的训练信号和足够的深度。</p>
-      </div>`
-    },
-    {
-      icon: '📜',
-      title: '代表方法',
-      tags: ['方法'],
-      expanded: false,
-      body: `<ul class="nested-list">
-        <li><strong>深度信念网络（DBN）</strong>：逐层贪心预训练 RBM，深度学习的前身</li>
-        <li><strong>堆叠自编码器（Stacked AE）</strong>：逐层训练 AE，然后把编码器堆叠起来</li>
-        <li><strong>ResNet / ViT</strong>：现代深度网络，端到端训练，自然形成层次表示</li>
-        <li><strong>U-Net</strong>：跳跃连接把低层细节保留到高层，形成"横跨层级"的表示</li>
-      </ul>`
     },
   ]
 };
