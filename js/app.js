@@ -325,7 +325,7 @@
         html += '<div class="tl-item' + (expanded ? ' expanded' : ' collapsed') + '" id="' + tlId + '">'
               + '<div class="tl-card">'
               + '<div class="tl-card-header" data-tl="' + tlId + '">'
-              + '<span class="tl-date">' + item.date + '</span>'
+              + '<span class="tl-date">📅 ' + item.date + '</span>'
               + '<span class="tl-title">' + item.title + '</span>'
               + (item.tags ? '<span class="tl-tags">' + item.tags.map(function (t) { return '<span class="tl-tag">' + t + '</span>'; }).join('') + '</span>' : '')
               + '<span class="tl-arrow">▶</span>'
