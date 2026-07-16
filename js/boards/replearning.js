@@ -799,7 +799,7 @@ CONTENT['foundation'] = {
       title: '表征学习-数学模型和研究目的',
       tags: ['起点'],
       expanded: true,
-      body: `<h3>一、先理解表征学习到底在研究什么</h3>
+      body: `<h3>一、数学模型</h3>
       <p>可以先把所有模型抽象成：</p>
       <p style="text-align: center; font-size: 1.1em;">$x \\xrightarrow{f_\\theta} z \\xrightarrow{g_\\phi} y$</p>
       <p>其中：</p>
@@ -811,7 +811,8 @@ CONTENT['foundation'] = {
         <li>$y$：最终输出。</li>
       </ul>
       <p>表征学习真正关心的不是"用了什么网络"，而是：保留了输入中的什么信息，舍弃了什么信息，以及这种信息组织方式能否迁移到新的任务。</p>
-      <p>经典的表征学习综述把这个问题描述为：数据背后存在若干解释性变化因素，而不同表示会以不同程度把这些因素纠缠或者分离。</p>
+      <h3>二、研究目的</h3>
+      <p>经典的表征学习综述把这个问题描述为：数据背后存在若干解释性变化因素，而不同表示会以不同程度把这些因素纠缠或者分离。<a href="https://arxiv.org/abs/1206.5538" target="_blank" rel="noopener">× arXiv</a></p>
       <p>例如一张猫的照片包含：</p>
       <div class="example-box">
         <div class="example-box-title">🐱 猫的图片属性示例</div>
