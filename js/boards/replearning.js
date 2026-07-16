@@ -4,7 +4,6 @@ const HOME_GRID = [
   { id: 'foundation',       icon: '📜', title: '基础知识',       desc: '表征学习的数学模型与研究目的' },
   { id: 'overview',         icon: '🔭', title: '发展史',       desc: '表征学习发展里程碑' },
   { id: 'self-supervised',  icon: '🔄', title: '自监督学习',     desc: '生成式 · 对比式 · 非对比式' },
-  { id: 'linear-nonlinear', icon: '⚡', title: '线性 vs 非线性', desc: '核心对照、核技巧、线性探针' },
   { id: 'architecture',     icon: '🏗️', title: '架构范式对照',   desc: 'AE vs U-Net 设计哲学' },
   { id: 'notes',            icon: '📝', title: '理解笔记',       desc: '关键洞察和核心速记' },
   { id: 'supervised',       icon: '🏛️', title: '监督表示学习',   desc: 'ImageNet 预训练、线性探针' },
@@ -15,7 +14,6 @@ const HOME_UPDATES = [
   { date: '2026-07-11', text: '新增基础知识：数学模型与研究目的', id: 'foundation' },
   { date: '2026-06-30', text: '创建表征学习发展史时间轴',        id: 'overview' },
   { date: '2026-06-30', text: '自监督学习三大范式',            id: 'self-supervised' },
-  { date: '2026-06-30', text: '线性 vs 非线性完整对照',        id: 'linear-nonlinear' },
   { date: '2026-06-30', text: '架构范式对照：AE vs U-Net',     id: 'architecture' },
   { date: '2026-06-30', text: '理解笔记沉淀',                  id: 'notes' },
 ];
@@ -48,8 +46,6 @@ const NAV_TREE = [
       { id: 'multitask',    label: '多任务表示学习' },
     ]
   },
-  { id: 'div2', type: 'divider' },
-  { id: 'linear-nonlinear', icon: '⚡', label: '线性 vs 非线性' },
   { id: 'architecture',     icon: '🏗️', label: '架构范式对照' },
   { id: 'notes',            icon: '📝', label: '理解笔记' },
 ];
@@ -380,53 +376,6 @@ CONTENT['multitask'] = {
   ]
 };
 
-/* ─── 线性 vs 非线性 ─── */
-CONTENT['linear-nonlinear'] = {
-  title: '⚡ 线性 vs 非线性表示',
-  desc: '表示学习最早的核心分类方式——表示的编码映射是否为线性变换。这个二分法贯穿了整个领域的历史。',
-  cards: [
-    {
-      icon: '📏',
-      title: '本质差别在哪里？',
-      tags: ['核心理念'],
-      expanded: true,
-      body: `<table class="comp-table">
-        <tr><th></th><th>线性</th><th>非线性</th></tr>
-        <tr><td>公式</td><td><span class="code-inline">Z = WX + b</span></td><td><span class="code-inline">Z = σ(WX + b)</span></td></tr>
-        <tr><td>表示空间</td><td>线性子空间（超平面）</td><td>弯曲流形</td></tr>
-        <tr><td>捕获的统计量</td><td>二阶（协方差）</td><td>高阶、非欧</td></tr>
-        <tr><td>训练方式</td><td>有闭式解（SVD / 矩阵分解）</td><td>需要梯度下降（BP + SGD）</td></tr>
-        <tr><td>最优解</td><td>保证全局最优</td><td>不保证（可能陷入局部最优）</td></tr>
-        <tr><td>堆叠多层</td><td>等价于一层（线性闭包）</td><td>产生层次抽象</td></tr>
-        <tr><td>代表方法</td><td>PCA, SVD, NMF, ICA, LDA</td><td>Deep AE, VAE, SimCLR, ViT</td></tr>
-      </table>
-      <p>从形式上看，差距确实就一个激活函数——但这个"差距"打开了一整个新世界。</p>`
-    },
-    {
-      icon: '🌀',
-      title: '核技巧：一个有趣的中间地带',
-      tags: ['补充'],
-      expanded: false,
-      body: `<p>核技巧让你用线性方法解决非线性问题：</p>
-      <p>非线性映射 <span class="code-inline">φ: x → φ(x)</span> 把数据映射到高维→在高维空间做线性方法（SVM, PCA）→但不显式计算 φ(x)，而是用核函数 <span class="code-inline">K(xᵢ, xⱼ) = φ(xᵢ)·φ(xⱼ)</span></p>
-      <p>所以它是<strong>形式上的非线性、算法上的线性</strong>——训练方式还是有闭式解（SVD），但也等价于在原始空间学到了一个非线性流形。</p>`
-    },
-    {
-      icon: '🔬',
-      title: '现代视角：线性探针',
-      tags: ['前沿'],
-      expanded: false,
-      body: `<p>一个有趣的反直觉现象：</p>
-      <p>现代深度表示学习（CLIP, DINOv2, SimCLR）学到的特征是深度非线性的，但人们用<strong>线性探针</strong>（Linear Probe）——在冻结的特征上只训练一个线性分类器——来评估特征质量。</p>
-      <p>如果线性探针效果好，说明非线性的编码器把数据"拉直"了，使得数据在最终的特征空间中是<strong>线性可分的</strong>。这本质上是非线性编码器在"学一个让线性方法有效的空间"。</p>
-      <div class="example-box">
-        <div class="example-box-title">💡 理解要点</div>
-        <p>线性 vs 非线性不是非黑即白的——现代方法在<strong>编码阶段用非线性</strong>，在<strong>应用阶段假设线性可分</strong>。最好的非线性，是让数据变"线性"的非线性。</p>
-      </div>`
-    },
-  ]
-};
-
 /* ─── 架构范式对照 ─── */
 CONTENT['architecture'] = {
   title: '🏗️ 架构范式对照',
@@ -614,6 +563,45 @@ CONTENT['foundation'] = {
       <p>但对于姿态估计任务，姿态又必须被保留。</p>
       <p>所以没有脱离任务和环境的"绝对好表征"。更准确的问题是：</p>
       <blockquote>对于哪些任务、哪些变化、哪些数据分布，这个表征是好的？</blockquote>`
+    },
+    {
+      icon: '📏',
+      title: '本质差别在哪里？',
+      tags: ['核心理念'],
+      expanded: false,
+      body: `<table class="comp-table">
+        <tr><th></th><th>线性</th><th>非线性</th></tr>
+        <tr><td>公式</td><td><span class="code-inline">Z = WX + b</span></td><td><span class="code-inline">Z = σ(WX + b)</span></td></tr>
+        <tr><td>表示空间</td><td>线性子空间（超平面）</td><td>弯曲流形</td></tr>
+        <tr><td>捕获的统计量</td><td>二阶（协方差）</td><td>高阶、非欧</td></tr>
+        <tr><td>训练方式</td><td>有闭式解（SVD / 矩阵分解）</td><td>需要梯度下降（BP + SGD）</td></tr>
+        <tr><td>最优解</td><td>保证全局最优</td><td>不保证（可能陷入局部最优）</td></tr>
+        <tr><td>堆叠多层</td><td>等价于一层（线性闭包）</td><td>产生层次抽象</td></tr>
+        <tr><td>代表方法</td><td>PCA, SVD, NMF, ICA, LDA</td><td>Deep AE, VAE, SimCLR, ViT</td></tr>
+      </table>
+      <p>从形式上看，差距确实就一个激活函数——但这个"差距"打开了一整个新世界。</p>`
+    },
+    {
+      icon: '🌀',
+      title: '核技巧：一个有趣的中间地带',
+      tags: ['补充'],
+      expanded: false,
+      body: `<p>核技巧让你用线性方法解决非线性问题：</p>
+      <p>非线性映射 <span class="code-inline">φ: x → φ(x)</span> 把数据映射到高维→在高维空间做线性方法（SVM, PCA）→但不显式计算 φ(x)，而是用核函数 <span class="code-inline">K(xᵢ, xⱼ) = φ(xᵢ)·φ(xⱼ)</span></p>
+      <p>所以它是<strong>形式上的非线性、算法上的线性</strong>——训练方式还是有闭式解（SVD），但也等价于在原始空间学到了一个非线性流形。</p>`
+    },
+    {
+      icon: '🔬',
+      title: '现代视角：线性探针',
+      tags: ['前沿'],
+      expanded: false,
+      body: `<p>一个有趣的反直觉现象：</p>
+      <p>现代深度表示学习（CLIP, DINOv2, SimCLR）学到的特征是深度非线性的，但人们用<strong>线性探针</strong>（Linear Probe）——在冻结的特征上只训练一个线性分类器——来评估特征质量。</p>
+      <p>如果线性探针效果好，说明非线性的编码器把数据"拉直"了，使得数据在最终的特征空间中是<strong>线性可分的</strong>。这本质上是非线性编码器在"学一个让线性方法有效的空间"。</p>
+      <div class="example-box">
+        <div class="example-box-title">💡 理解要点</div>
+        <p>线性 vs 非线性不是非黑即白的——现代方法在<strong>编码阶段用非线性</strong>，在<strong>应用阶段假设线性可分</strong>。最好的非线性，是让数据变"线性"的非线性。</p>
+      </div>`
     },
   ]
 };
