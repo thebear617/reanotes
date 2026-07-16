@@ -3,9 +3,9 @@
 const HOME_GRID = [
   { id: 'foundation',       icon: '📜', title: '基础知识',       desc: '表征学习的数学模型与研究目的' },
   { id: 'overview',         icon: '🔭', title: '发展史',       desc: '表征学习发展里程碑' },
-  { id: 'self-supervised',  icon: '🔄', title: '自监督学习',     desc: '生成式 · 对比式 · 非对比式' },
   { id: 'architecture',     icon: '🏗️', title: '架构范式对照',   desc: 'AE vs U-Net 设计哲学' },
   { id: 'notes',            icon: '📝', title: '理解笔记',       desc: '关键洞察和核心速记' },
+  { id: 'self-supervised',  icon: '🔄', title: '自监督学习',     desc: '生成式 · 对比式 · 非对比式' },
   { id: 'supervised',       icon: '🏛️', title: '监督表示学习',   desc: 'ImageNet 预训练、线性探针' },
   { id: 'metric',           icon: '📏', title: '度量学习',       desc: 'Triplet Loss、ArcFace' },
 ];
@@ -28,6 +28,8 @@ const HOME_QUICKREF = [
 const NAV_TREE = [
   { id: 'foundation',  icon: '📜', label: '基础知识' },
   { id: 'overview',    icon: '🔭', label: '发展史' },
+  { id: 'architecture',     icon: '🏗️', label: '架构范式对照' },
+  { id: 'notes',            icon: '📝', label: '理解笔记' },
   { id: 'div1',        type: 'divider' },
   {
     id: 'cat-supervision', icon: '📐', label: '按监督信号',
@@ -46,8 +48,6 @@ const NAV_TREE = [
       { id: 'multitask',    label: '多任务表示学习' },
     ]
   },
-  { id: 'architecture',     icon: '🏗️', label: '架构范式对照' },
-  { id: 'notes',            icon: '📝', label: '理解笔记' },
 ];
 
 /* ===== 内容数据 ===== */
