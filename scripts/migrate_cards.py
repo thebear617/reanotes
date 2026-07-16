@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""migrate_cards.py — 一次性：把 replearning.js 里的内联 body: HTML 反推成 .md 源文件。
+"""migrate_cards.py — 把板块 JS 里的内联 body: HTML 反推成 .md 源文件。
 
 产出：
-    content/tabs/replearning/boards/<page>/<slug>.md
+    content/tabs/<board>/boards/<page>/<slug>.md
         文件头 frontmatter（icon/title/tags/expanded），正文为标准 Markdown。
 
 转换规则（覆盖现有卡片用到的全部结构）：
@@ -18,7 +18,7 @@
     <table class="comp-table"> → GFM 表格；colspan → 加粗引导行降级
     <p style="...center">$x$</p> → $$x$$（块级居中）
 
-注意：本脚本只负责「生成源文件」，不改 replearning.js。
+注意：本脚本只负责「生成源文件」，不改原始板块 JS。
 生成后请手跑 build-cards.py 看结果，再用 cards-diff 校验保真。
 """
 
@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import re
 import sys
+from argparse import ArgumentParser
 from pathlib import Path
 from html.parser import HTMLParser
 
@@ -237,7 +238,15 @@ def html_to_markdown(html: str) -> str:
             m = m.strip("\n")
             if m:
                 blocks.append(m)
-    return "\n\n".join(blocks)
+    markdown = "\n\n".join(blocks)
+    return re.sub(
+        r"\]\(#([a-z][a-z0-9-]*)(?:/([^)]+))?\)",
+        lambda match: "](/"
+        + match.group(1)
+        + (f"/{match.group(2)}" if match.group(2) else "")
+        + "/)",
+        markdown,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -248,7 +257,7 @@ _CARD_RE = re.compile(
     r"icon:\s*'([^']*)'\s*,\s*"
     r"title:\s*'([^']*)'\s*,\s*"
     r"tags:\s*\[([^\]]*)\]\s*,\s*"
-    r"expanded:\s*(\w+)\s*,\s*"
+    r"(?:expanded:\s*(\w+)\s*,\s*)?"
     r"body:\s*`(.*?)`",
     re.DOTALL,
 )
@@ -280,9 +289,19 @@ def _parse_tags(raw: str) -> list[str]:
     return [x.strip().strip("'\"") for x in raw.split(",") if x.strip()]
 
 
-def migrate(reanotes_root: Path):
-    src_file = reanotes_root / "js" / "boards" / "replearning.js"
+def migrate(
+    reanotes_root: Path,
+    board: str = "replearning",
+    output_root: Path | None = None,
+    vuepress: bool = False,
+):
+    src_file = reanotes_root / "js" / "boards" / f"{board}.js"
     src = src_file.read_text(encoding="utf-8")
+
+    if output_root is None:
+        output_root = (
+            reanotes_root / "content" / "tabs" / board / "boards"
+        )
 
     page_blocks = list(_PAGE_RE.finditer(src))
     total = 0
@@ -296,43 +315,60 @@ def migrate(reanotes_root: Path):
             continue
         cards_region = cm.group(1)
 
-        out_dir = (
-            reanotes_root
-            / "content"
-            / "tabs"
-            / "replearning"
-            / "boards"
-            / page
-        )
+        out_dir = output_root / page
         out_dir.mkdir(parents=True, exist_ok=True)
         used: set[str] = set()
 
         for m in _CARD_RE.finditer(cards_region):
             icon, title, tags_raw, expanded, body = m.groups()
             slug = _slug(title, used)
-            md = (
-                "---\n"
-                f"icon: {icon}\n"
-                f"title: {title}\n"
-                f"tags: [{', '.join(_parse_tags(tags_raw))}]\n"
-                f"expanded: {expanded}\n"
-                "---\n\n"
-                + html_to_markdown(body)
-                + "\n"
-            )
+            frontmatter = ["---", f"title: {title}"]
+            if vuepress:
+                frontmatter.append(f"tag: [{', '.join(_parse_tags(tags_raw))}]")
+            else:
+                frontmatter.extend(
+                    [
+                        f"icon: {icon}",
+                        f"tags: [{', '.join(_parse_tags(tags_raw))}]",
+                        f"expanded: {expanded or 'false'}",
+                    ]
+                )
+            frontmatter.extend(["---", ""])
+            md = "\n".join(frontmatter) + "\n" + html_to_markdown(body) + "\n"
             (out_dir / f"{slug}.md").write_text(md, encoding="utf-8")
             total += 1
             print(f"  ✅ {page}/{slug}.md  ({title})")
 
     print(f"\n[migrate] 共生成 {total} 张卡片的 .md 源文件")
-    print(f"[migrate] 输出目录: content/tabs/replearning/boards/")
+    print(f"[migrate] 输出目录: {output_root.relative_to(reanotes_root)}/")
 
 
 def main():
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--board",
+        default="replearning",
+        help="js/boards 下的板块文件名（默认: replearning）",
+    )
+    parser.add_argument(
+        "--output-root",
+        type=Path,
+        help="输出根目录；相对路径按仓库根目录解析",
+    )
+    parser.add_argument(
+        "--vuepress",
+        action="store_true",
+        help="生成 Theme Hope 兼容的精简 frontmatter",
+    )
+    args = parser.parse_args()
+
     script_dir = Path(__file__).resolve().parent
     reanotes_root = script_dir.parent
+    output_root = args.output_root
+    if output_root is not None and not output_root.is_absolute():
+        output_root = reanotes_root / output_root
     print(f"[migrate] reanotes 根: {reanotes_root}")
-    migrate(reanotes_root)
+    migrate(reanotes_root, args.board, output_root, args.vuepress)
 
 
 if __name__ == "__main__":

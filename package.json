@@ -20,7 +20,7 @@
   },
   "nano-staged": {
     "**/*": "prettier --write --ignore-unknown",
-    ".md": "markdownlint-cli2"
+    "**/*.md": "markdownlint-cli2"
   },
   "dependencies": {
     "@mathjax/src": "^4.1.3",

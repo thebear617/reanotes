@@ -18,6 +18,7 @@ export const theme = hopeTheme({
     align: true,
     codeTabs: true,
     gfm: true,
+    linksCheck: true,
     math: {
       type: "mathjax",
     },
