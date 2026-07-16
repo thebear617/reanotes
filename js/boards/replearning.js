@@ -1,7 +1,7 @@
 (function () {
 /* ===== 首页数据 ===== */
 const HOME_GRID = [
-  { id: 'foundation',       icon: '📜', title: '基础知识',       desc: 'Bengio 定义与十大先验' },
+  { id: 'foundation',       icon: '📜', title: '基础知识',       desc: '表征学习的数学模型与研究目的' },
   { id: 'overview',         icon: '🔭', title: '发展史',       desc: '表征学习发展里程碑' },
   { id: 'self-supervised',  icon: '🔄', title: '自监督学习',     desc: '生成式 · 对比式 · 非对比式' },
   { id: 'linear-nonlinear', icon: '⚡', title: '线性 vs 非线性', desc: '核心对照、核技巧、线性探针' },
@@ -13,7 +13,7 @@ const HOME_GRID = [
 ];
 
 const HOME_UPDATES = [
-  { date: '2026-07-11', text: '新增基础知识：Bengio 定义与十大先验', id: 'foundation' },
+  { date: '2026-07-11', text: '新增基础知识：数学模型与研究目的', id: 'foundation' },
   { date: '2026-06-30', text: '创建表征学习发展史时间轴',        id: 'overview' },
   { date: '2026-06-30', text: '自监督学习三大范式',            id: 'self-supervised' },
   { date: '2026-06-30', text: '线性 vs 非线性完整对照',        id: 'linear-nonlinear' },
@@ -792,7 +792,7 @@ CONTENT['notes'] = {
 /* ─── 基础知识 ─── */
 CONTENT['foundation'] = {
   title: '📜 基础知识',
-  desc: '表征学习为什么重要、Bengio 如何定义它、以及支撑整个领域的十大先验（prior）。这是后续所有分类轴的"元框架"。',
+  desc: '表征学习为什么重要，以及背后的数学模型与研究目的。',
   cards: [
     {
       icon: '🧭',
@@ -834,27 +834,6 @@ CONTENT['foundation'] = {
       <p>但对于姿态估计任务，姿态又必须被保留。</p>
       <p>所以没有脱离任务和环境的"绝对好表征"。更准确的问题是：</p>
       <blockquote>对于哪些任务、哪些变化、哪些数据分布，这个表征是好的？</blockquote>`
-    },
-    {
-      icon: '🧬',
-      title: '十大先验（Bengio 的 priors）',
-      tags: ['框架', '总纲'],
-      expanded: true,
-      body: `<p>为获得好表征，建模时应嵌入一些对多目标通用的<strong>先验知识</strong>。Bengio 列出如下（"站点对应"指向本知识库已有页面）：</p>
-      <table class="comp-table">
-        <tr><th>#</th><th>先验</th><th>一句话含义</th><th>站点对应</th></tr>
-        <tr><td>01</td><td>Smoothness</td><td>输入相近 → 表征相近（x≈y ⇒ f(x)≈f(y)）</td><td>—（基础假设）</td></tr>
-        <tr><td>02</td><td>Multiple explanatory factors</td><td>数据由多个解释因子决定，应尽量<strong>解耦</strong></td><td><a href="#replearning/disentangled">解耦表示</a></td></tr>
-        <tr><td>03</td><td>Hierarchical organization</td><td>越抽象的概念位于越高层</td><td><a href="#replearning/hierarchical">分层表示</a></td></tr>
-        <tr><td>04</td><td>Semi-supervised learning</td><td>表征在无监督/有监督间共享统计优势</td><td><a href="#replearning/semi-supervised">半监督</a></td></tr>
-        <tr><td>05</td><td>Shared factors across tasks</td><td>同一表征跨任务有效（多任务/迁移/域适应）</td><td><a href="#replearning/transfer">迁移</a> · <a href="#replearning/multitask">多任务</a></td></tr>
-        <tr><td>06</td><td>Manifolds</td><td>表征落在高维空间的低维流形上</td><td><a href="#replearning/unsupervised">无监督（AE/流形）</a></td></tr>
-        <tr><td>07</td><td>Natural clustering</td><td>不同类分布在分散流形，类间插值处于低密度区</td><td>—（聚类视角）</td></tr>
-        <tr><td>08</td><td>Temporal / spatial coherence</td><td>序列连续或空间相邻的样本在流形上仅微变</td><td><a href="#replearning/sequence">序列表示</a></td></tr>
-        <tr><td>09</td><td>Sparsity</td><td>多数特征接近 0，鲁棒且可解释</td><td><a href="#replearning/sparse">稀疏表示</a></td></tr>
-        <tr><td>10</td><td>Simplicity of factor dependencies</td><td>高层表征因子依赖应简单（典型线性，如物理定律）</td><td><a href="#replearning/linear-nonlinear">线性 vs 非线性</a></td></tr>
-      </table>
-      <p>注：如何把这些先验<strong>形式化为可优化的评价准则</strong>，至今仍是开放问题——这也是表征学习最核心的研究动机之一。</p>`
     },
   ]
 };
