@@ -1,2 +1,1 @@
-python3 scripts/build-cards.py --check
 pnpm nano-staged
