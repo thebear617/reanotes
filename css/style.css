@@ -609,7 +609,6 @@ button {
   color: #33302d;
   font-size: .9rem;
   line-height: 1.7;
-  max-width: 720px;
 }
 
 .card-inner p:first-child {
@@ -625,7 +624,6 @@ button {
   color: #33302d;
   font-size: .9rem;
   line-height: 1.7;
-  max-width: 720px;
 }
 
 .card-inner li {
@@ -654,7 +652,6 @@ button {
 
 .card-inner table {
   width: 100%;
-  max-width: 720px;
   margin-top: .6rem;
   border-collapse: collapse;
   font-size: .85rem;
