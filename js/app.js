@@ -40,11 +40,18 @@
     if (!root) return;
     root.querySelectorAll('[data-markdown-source]').forEach(async function (target) {
       const source = target.dataset.markdownSource;
+      // 显式相对于当前文档解析路径，避免 hash 路由或 base 标签带来的歧义
+      const resolvedUrl = new URL(source, document.baseURI).href;
+
       try {
         if (!window.marked || !window.marked.parse) {
           throw new Error('Markdown parser is unavailable');
         }
-        const response = await fetch(source);
+        if (window.location.protocol === 'file:') {
+          throw new Error('file protocol');
+        }
+
+        const response = await fetch(resolvedUrl);
         if (!response.ok) throw new Error('HTTP ' + response.status);
         const markdown = await response.text();
         if (!target.isConnected) return;
@@ -54,6 +61,7 @@
           breaks: false,
         });
         target.classList.remove('markdown-loading');
+        target.classList.add('markdown-loaded');
 
         target.querySelectorAll('a[href]').forEach(function (link) {
           if (/^https?:\/\//.test(link.href)) {
@@ -72,8 +80,17 @@
         if (!target.isConnected) return;
         target.classList.remove('markdown-loading');
         target.classList.add('markdown-error');
-        target.textContent = 'Markdown 加载失败：' + source;
-        console.error('Failed to load markdown:', source, e);
+
+        let message = 'Markdown 加载失败：' + source;
+        if (window.location.protocol === 'file:') {
+          message = '⚠️ 当前通过 file:// 打开页面，无法加载本地 Markdown。请先在 reanotes/ 目录执行：python3 -m http.server 8000';
+        } else if (e.message && e.message.startsWith('HTTP ')) {
+          message = 'Markdown 加载失败（' + e.message + '）：' + source;
+        } else if (e.message === 'Markdown parser is unavailable') {
+          message = 'Markdown 解析器未加载：' + source;
+        }
+        target.textContent = message;
+        console.error('Failed to load markdown:', resolvedUrl, e);
       }
     });
   }
