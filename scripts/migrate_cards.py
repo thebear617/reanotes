@@ -317,6 +317,20 @@ def migrate(
 
         out_dir = output_root / page
         out_dir.mkdir(parents=True, exist_ok=True)
+        if vuepress:
+            page_meta = re.search(
+                r"title:\s*'([^']*)'\s*,\s*desc:\s*'([^']*)'", region
+            )
+            if page_meta:
+                page_title, page_desc = page_meta.groups()
+                (out_dir / "README.md").write_text(
+                    "---\n"
+                    f"title: {page_title}\n"
+                    "index: false\n"
+                    "---\n\n"
+                    f"{page_desc}\n",
+                    encoding="utf-8",
+                )
         used: set[str] = set()
 
         for m in _CARD_RE.finditer(cards_region):
