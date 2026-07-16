@@ -19,6 +19,65 @@
   /* ===== Helpers ===== */
   function boardData(id) { return BOARD_DATA[id]; }
 
+  function renderMath(root) {
+    if (!root || !window.renderMathInElement) return;
+    try {
+      renderMathInElement(root, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\[', right: '\\]', display: true },
+          { left: '\\(', right: '\\)', display: false },
+        ],
+        throwOnError: false,
+      });
+    } catch (e) {
+      console.warn('KaTeX render failed:', e);
+    }
+  }
+
+  function loadMarkdownCards(root) {
+    if (!root) return;
+    root.querySelectorAll('[data-markdown-source]').forEach(async function (target) {
+      const source = target.dataset.markdownSource;
+      try {
+        if (!window.marked || !window.marked.parse) {
+          throw new Error('Markdown parser is unavailable');
+        }
+        const response = await fetch(source);
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const markdown = await response.text();
+        if (!target.isConnected) return;
+
+        target.innerHTML = window.marked.parse(markdown, {
+          gfm: true,
+          breaks: false,
+        });
+        target.classList.remove('markdown-loading');
+
+        target.querySelectorAll('a[href]').forEach(function (link) {
+          if (/^https?:\/\//.test(link.href)) {
+            link.target = '_blank';
+            link.rel = 'noopener';
+          }
+        });
+        renderMath(target);
+
+        const card = target.closest('.card');
+        if (card && !card.classList.contains('collapsed')) {
+          const body = card.querySelector('.card-body');
+          if (body) body.style.maxHeight = (target.scrollHeight + 40) + 'px';
+        }
+      } catch (e) {
+        if (!target.isConnected) return;
+        target.classList.remove('markdown-loading');
+        target.classList.add('markdown-error');
+        target.textContent = 'Markdown 加载失败：' + source;
+        console.error('Failed to load markdown:', source, e);
+      }
+    });
+  }
+
   function updateTopBar(board) {
     topEyebrow.textContent = 'reanotes';
     topTitle.textContent = board ? board.name : '科研笔记';
@@ -296,6 +355,9 @@
       page.cards.forEach((card, idx) => {
         const cardId = 'card-' + id + '-' + idx;
         const collapsed = card.expanded ? '' : 'collapsed';
+        const cardBody = card.markdown
+          ? `<div class="card-inner markdown-card markdown-loading" data-markdown-source="${card.markdown}"><p>正在加载 Markdown…</p></div>`
+          : `<div class="card-inner">${card.body || ''}</div>`;
         html += `
           <div class="card ${collapsed}" id="${cardId}">
             <div class="card-header" data-card="${cardId}">
@@ -305,7 +367,7 @@
               <span class="card-arrow">▶</span>
             </div>
             <div class="card-body" style="max-height: ${card.expanded ? '2000px' : '0'}">
-              <div class="card-inner">${card.body}</div>
+              ${cardBody}
             </div>
           </div>`;
       });
@@ -406,22 +468,8 @@
     html += '</div>';
     contentArea.innerHTML = html;
 
-    // KaTeX 渲染（论文翻译板块用）
-    if (window.renderMathInElement) {
-      try {
-        renderMathInElement(contentArea, {
-          delimiters: [
-            { left: '$$', right: '$$', display: true },
-            { left: '$', right: '$', display: false },
-            { left: '\\[', right: '\\]', display: true },
-            { left: '\\(', right: '\\)', display: false },
-          ],
-          throwOnError: false,
-        });
-      } catch (e) {
-        console.warn('KaTeX render failed:', e);
-      }
-    }
+    renderMath(contentArea);
+    loadMarkdownCards(contentArea);
 
     // 时间轴折叠
     document.querySelectorAll('.tl-card-header').forEach(function (header) {

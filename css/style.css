@@ -615,6 +615,19 @@ button {
   margin-top: 0;
 }
 
+.markdown-loading {
+  color: var(--muted);
+}
+
+.markdown-loading p {
+  color: inherit;
+}
+
+.markdown-error {
+  color: var(--red);
+  font-size: .85rem;
+}
+
 /* ── card-inner 内联排版 ── */
 
 .card-inner ol,

@@ -26,6 +26,7 @@ reanotes 首页（板块总览仪表盘）
 
 ```
 ├── index.html              # 页面入口（标题、顶栏、板块切换器容器）
+├── content/                # Markdown 正文源文件（按板块/页面组织）
 ├── css/
 │   └── style.css           # 所有样式（靛青色系 + 侧边栏布局 + 仪表盘/切换器）
 └── js/
@@ -43,8 +44,23 @@ reanotes 首页（板块总览仪表盘）
 
 1. 在 `navTree` 数组加入口（叶节点 `{id, icon, label}` 或带 `children` 的父节点；也可用 `{type: 'divider'}` 分隔条）
 2. 在 `content` 对象加对应页面（`title` / `desc` / `cards` 数组）
-3. 卡片 schema：`{icon, title, tags, expanded, body}`，`body` 是 HTML
-4. 首页 `HOME_GRID` / `HOME_UPDATES` / `HOME_QUICKREF` 是板块首页的独立列表
+3. 卡片 schema 推荐使用 `{icon, title, tags, expanded, markdown}`，`markdown` 指向 `content/` 下的 Markdown 文件
+4. 旧卡片的 `body` HTML 仍然兼容，便于逐页迁移；新增正文不要再写内嵌 HTML
+5. 首页 `HOME_GRID` / `HOME_UPDATES` / `HOME_QUICKREF` 是板块首页的独立列表
+
+例如：
+
+```js
+{
+  icon: '🏛️',
+  title: 'ImageNet 预训练范式',
+  tags: ['经典'],
+  expanded: true,
+  markdown: 'content/replearning/supervised/imagenet.md'
+}
+```
+
+正文直接在对应的 `.md` 文件中编辑。网站会在浏览器中读取并渲染标准 Markdown，支持标题、段落、强调、列表、链接、表格、代码块及 KaTeX 数学公式。由于正文通过 `fetch` 读取，本地预览必须使用静态服务器，不能直接双击打开 `index.html`。
 
 ### 新增一个研究板块
 
