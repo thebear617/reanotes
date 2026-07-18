@@ -28,7 +28,7 @@
 
 ## 3 模型架构
 
-大多数有竞争力的神经序列转导模型都具有编码器-解码器结构[5, 2, 35]。在这里，编码器将输入符号表示序列 $(x_1, ..., x_n)$ 映射到连续表示序列 $\textbf{z} = (z_1, ..., z_n)$。给定z，解码器然后一次一个元素地生成输出符号序列 $(y_1, ..., y_m)$。在每一步，模型都是自回归的[10]，在生成下一个符号时，将先前生成的符号作为额外输入。
+大多数有竞争力的神经序列转导模型都具有编码器-解码器结构[5, 2, 35]。在这里，编码器将输入符号表示序列 $(x_1, ..., x_n)$ 映射到连续表示序列 $\mathbf{z} = (z_1, ..., z_n)$。给定 $\mathbf{z}$，解码器然后一次一个元素地生成输出符号序列 $(y_1, ..., y_m)$。在每一步，模型都是自回归的[10]，在生成下一个符号时，将先前生成的符号作为额外输入。
 
 ![](./images/f7896a22ff43c1f81531754bb9c3f1e738ea4cf8f64eb0a2e62ca12ec9f973de.jpg)  
 图1: Transformer - 模型架构。
@@ -71,10 +71,15 @@ $$
 多头注意力允许模型共同关注来自不同位置的不同表示子空间的信息。使用单个注意力头，平均会抑制这一点。
 
 $$
-\begin{array} { r } { \begin{array} { r l } & { \mathrm{MultiHead}(Q, K, V) = \mathrm{Concat}(\mathrm{head}_1, ..., \mathrm{head}_{\mathrm{h}}) W^O } \\ & { \qquad \mathrm{where~head}_{\mathrm{i}} = \mathrm{Attention}(Q W_i^Q, K W_i^K, V W_i^V) } \end{array} } \end{array}
+\begin{aligned}
+\mathrm{MultiHead}(Q,K,V)
+  &= \mathrm{Concat}(\mathrm{head}_1,\ldots,\mathrm{head}_h)W^O, \\
+\mathrm{head}_i
+  &= \mathrm{Attention}(QW_i^Q,KW_i^K,VW_i^V).
+\end{aligned}
 $$
 
-其中投影是参数矩阵 $\begin{array} { r } { W_i^Q \in \mathbb{R}^{d_{\mathrm{model}} \times d_k}, W_i^K \in \mathbb{R}^{d_{\mathrm{model}} \times d_k}, W_i^V \in \mathbb{R}^{d_{\mathrm{model}} \times d_v} } \end{array}$ 和 $W^O \in \mathbb{R}^{h d_v \times d_{\mathrm{model}}}$。
+其中投影是参数矩阵 $W_i^Q \in \mathrm{R}^{d_{\mathrm{model}} \times d_k}$、$W_i^K \in \mathrm{R}^{d_{\mathrm{model}} \times d_k}$、$W_i^V \in \mathrm{R}^{d_{\mathrm{model}} \times d_v}$ 和 $W^O \in \mathrm{R}^{h d_v \times d_{\mathrm{model}}}$。
 
 在这项工作中，我们采用 $h := 8$ 个并行注意力层或头。对于每个头，我们使用 $d_k = d_v = d_{\mathrm{model}} / h = 64$。由于每个头的维度降低，总计算成本与具有完整维度的单头注意力相似。
 
@@ -102,8 +107,14 @@ $$
 
 与其他序列转导模型类似，我们使用学习到的嵌入将输入词元和输出词元转换为维度为 $d_{\mathrm{model}}$ 的向量。我们还使用通常的学习到的线性变换和 softmax 函数将解码器输出转换为预测的下一个词元概率。在我们的模型中，我们在两个嵌入层和 pre-softmax 线性变换之间共享相同的权重矩阵，类似于[30]。在嵌入层中，我们将这些权重乘以 $\sqrt{d_{\mathrm{model}}}$。
 
-表1: 不同层类型的最大路径长度、每层复杂度和最小顺序操作数。n 是序列长度，d 是表示维度，k 是卷积的核大小，r 是受限自注意力中邻域的大小。
-<table><tr><td>Layer Type</td><td>Complexity per Layer</td><td>Sequential Operations</td><td>Maximum Path Length</td></tr><tr><td>Self-Attention</td><td> $\overline { { O ( n ^ { 2 } \cdot d ) } }$ </td><td>O(1)</td><td>0(1)</td></tr><tr><td>Recurrent</td><td> $O ( n \cdot d ^ { 2 } )$ </td><td>O(n)</td><td> $O ( n )$ </td></tr><tr><td>Convolutional</td><td> $O ( k \cdot n \cdot \dot { d } ^ { 2 } )$ </td><td>O(1)</td><td> $O ( l o g _ { k } ( n ) )$ </td></tr><tr><td>Self-Attention (restricted)</td><td> ${ \dot { O ( r \cdot n \cdot d ) } }$ </td><td>O(1)</td><td> $O ( n / r )$ </td></tr></table>
+表 1：不同层类型的最大路径长度、每层复杂度和最小顺序操作数。$n$ 是序列长度，$d$ 是表示维度，$k$ 是卷积的核大小，$r$ 是受限自注意力中邻域的大小。
+
+| 层类型 | 每层复杂度 | 顺序操作数 | 最大路径长度 |
+| --- | --- | --- | --- |
+| 自注意力 | $O(n^2 \cdot d)$ | $O(1)$ | $O(1)$ |
+| 循环层 | $O(n \cdot d^2)$ | $O(n)$ | $O(n)$ |
+| 卷积层 | $O(k \cdot n \cdot d^2)$ | $O(1)$ | $O(\log_k(n))$ |
+| 受限自注意力 | $O(r \cdot n \cdot d)$ | $O(1)$ | $O(n/r)$ |
 
 ## 3.5 位置编码
 
@@ -112,7 +123,10 @@ $$
 在这项工作中，我们使用不同频率的正弦和余弦函数：
 
 $$
-\begin{array} { r } { PE_{(pos, 2i)} = \sin(pos / 10000^{2i / d_{\mathrm{model}}}) } \\ { PE_{(pos, 2i+1)} = \cos(pos / 10000^{2i / d_{\mathrm{model}}}) } \end{array}
+\begin{aligned}
+PE_{(pos,2i)} &= \sin\left(pos / 10000^{2i/d_{\mathrm{model}}}\right), \\
+PE_{(pos,2i+1)} &= \cos\left(pos / 10000^{2i/d_{\mathrm{model}}}\right).
+\end{aligned}
 $$
 
 其中 pos 是位置，i 是维度。也就是说，位置编码的每个维度对应一个正弦波。波长形成从 $2\pi$ 到 $10000 \cdot 2\pi$ 的几何级数。我们选择这个函数是因为我们假设它能让模型轻松地学习通过相对位置进行关注，因为对于任何固定的偏移量 k，$PE_{pos+k}$ 可以表示为 $PE_{pos}$ 的线性函数。
@@ -121,7 +135,7 @@ $$
 
 ## 4 为什么选择自注意力
 
-在本节中，我们比较自注意力层与常用于将变长符号表示序列 $( x _ { 1 } , . . . , x _ { n } )$ 映射到等长序列 $\left( z _ { 1 } , . . . , z _ { n } \right)$ （其中 $x _ { i } , z _ { i } \in \mathbb { R } ^ { d }$ ）的循环层和卷积层的各个方面，例如典型序列转导编码器或解码器中的隐藏层。为说明我们使用自注意力的动机，我们考虑了三个期望特性。
+在本节中，我们比较自注意力层与常用于将变长符号表示序列 $(x_1,\ldots,x_n)$ 映射到等长序列 $(z_1,\ldots,z_n)$（其中 $x_i,z_i \in \mathrm{R}^d$）的循环层和卷积层的各个方面，例如典型序列转导编码器或解码器中的隐藏层。为说明我们使用自注意力的动机，我们考虑了三个期望特性。
 
 一是每层的总计算复杂度。二是可并行化的计算量，以所需的最小顺序操作数来衡量。
 
@@ -129,7 +143,7 @@ $$
 
 如表1所示，自注意力层以恒定数量的顺序执行操作连接所有位置，而循环层需要 $O ( n )$ 个顺序操作。在计算复杂度方面，当序列长度 n 小于表示维度 d 时，自注意力层比循环层更快，这在机器翻译中最先进模型使用的句子表示（如词片[38]和字节对[31]表示）中通常是这种情况。为了提高处理极长序列任务的计算性能，可以将自注意力限制为仅考虑输入序列中以相应输出位置为中心、大小为 r 的邻域。这将使最大路径长度增加到 $O ( n / r )$ 。我们计划在未来的工作中进一步研究这种方法。
 
-核宽度为 $k <$ n 的单层卷积层不能连接所有输入和输出位置对。要做到这一点，在连续核的情况下需要堆叠 $O ( n / k )$ 层卷积层，或在空洞卷积[18]的情况下需要 $O ( l o g _ { k } ( n ) )$ 层，这增加了网络中任意两个位置之间的最长路径长度。卷积层通常比循环层更昂贵，成本因子为 k。然而，可分离卷积[6]显著降低了复杂度，达到 $\overset { \cdot } { O ( k \cdot n \cdot d + n \cdot d ^ { 2 } ) }$ 。然而，即使 $k = n$ ，可分离卷积的复杂度也等于自注意力层和逐点前馈层的组合，这正是我们在模型中采用的方法。
+核宽度为 $k<n$ 的单层卷积层不能连接所有输入和输出位置对。要做到这一点，在连续核的情况下需要堆叠 $O(n/k)$ 层卷积层，或在空洞卷积[18]的情况下需要 $O(\log_k(n))$ 层，这增加了网络中任意两个位置之间的最长路径长度。卷积层通常比循环层更昂贵，成本因子为 $k$。然而，可分离卷积[6]显著降低了复杂度，达到 $O(k \cdot n \cdot d+n \cdot d^2)$。然而，即使 $k=n$，可分离卷积的复杂度也等于自注意力层和逐点前馈层的组合，这正是我们在模型中采用的方法。
 
 作为附带好处，自注意力可以产生更具可解释性的模型。我们检查了模型中的注意力分布，并在附录中展示和讨论了示例。不仅单个注意力头清楚地学会了执行不同的任务，许多注意力头似乎还表现出与句子的句法和语义结构相关的行为。
 
@@ -147,24 +161,43 @@ $$
 
 ## 5.3 优化器
 
-我们使用 Adam 优化器[20]，参数为 $\beta _ { 1 } = 0 . 9 , \beta _ { 2 } = 0 . 9 8$ 和 $\epsilon = 1 0 ^ { - 9 }$ 。我们在训练过程中根据以下公式改变学习率：
+我们使用 Adam 优化器[20]，参数为 $\beta_1=0.9$、$\beta_2=0.98$ 和 $\epsilon=10^{-9}$。我们在训练过程中根据以下公式改变学习率：
 
 $$
-l r a t e = d _ { \mathrm { m o d e l } } ^ { - 0 . 5 } \cdot \mathrm { m i n } ( s t e p _ { - } n u m ^ { - 0 . 5 } , s t e p _ { - } n u m \cdot w a r m u p _ { - } s t e p s ^ { - 1 . 5 } )\tag{3}
+\mathrm{lrate}
+=d_{\mathrm{model}}^{-0.5}\cdot
+\min\left(
+  \mathrm{step\_num}^{-0.5},
+  \mathrm{step\_num}\cdot\mathrm{warmup\_steps}^{-1.5}
+\right)\tag{3}
 $$
 
-这对应于在前 warmup\_steps 个训练步骤中线性增加学习率，然后按步数的平方根倒数成比例减小。我们使用 warmup $. s t e p s = 4 0 0 0$。
+这对应于在前 $\mathrm{warmup\_steps}$ 个训练步骤中线性增加学习率，然后按步数的平方根倒数成比例减小。我们使用 $\mathrm{warmup\_steps}=4000$。
 
 ## 5.4 正则化
 
 我们在训练中采用三种类型的正则化：
 
 表 2：Transformer 在英德和英法 newstest2014 测试集上以更低的训练成本取得了优于先前最先进模型的 BLEU 分数。
-<table><tr><td rowspan="2">Model</td><td colspan="2">BLEU</td><td colspan="2">Training Cost (FLOPs)</td></tr><tr><td>EN-DE</td><td>EN-FR</td><td>EN-DE</td><td>EN-FR</td></tr><tr><td>ByteNet [18]</td><td>23.75</td><td></td><td></td><td></td></tr><tr><td>Deep-Att + PosUnk [39]</td><td></td><td>39.2</td><td></td><td> $1 . 0 \cdot 1 0 ^ { 2 0 }$ </td></tr><tr><td>GNMT + RL [38]</td><td>24.6</td><td>39.92</td><td> $2 . 3 \cdot 1 0 ^ { 1 9 }$ </td><td> $1 . 4 \cdot 1 0 ^ { 2 0 }$ </td></tr><tr><td>ConvS2S [9]</td><td>25.16</td><td>40.46</td><td> $9 . 6 \cdot 1 0 ^ { 1 8 }$ </td><td> $1 . 5 \cdot 1 0 ^ { 2 0 }$ </td></tr><tr><td>MoE [32]</td><td>26.03</td><td>40.56</td><td> $2 . 0 \cdot 1 0 ^ { 1 9 }$ </td><td> $1 . 2 \cdot 1 0 ^ { 2 0 }$ </td></tr><tr><td>Deep-Att + PosUnk Ensemble [39]</td><td></td><td>40.4</td><td></td><td> $\overline { { 8 . 0 \cdot 1 0 ^ { 2 0 } } }$ </td></tr><tr><td> $\mathrm { G N M T } + \mathrm { R I }$  Ensemble [38]</td><td>26.30</td><td>41.16</td><td> $1 . 8 \cdot 1 0 ^ { 2 0 }$ </td><td> $1 . 1 \cdot 1 0 ^ { 2 1 }$ </td></tr><tr><td>ConvS2S Ensemble [9]</td><td>26.36</td><td>41.29</td><td> $7 . 7 \cdot 1 0 ^ { 1 9 }$ </td><td> $1 . 2 \cdot 1 0 ^ { 2 1 }$ </td></tr><tr><td>Transformer (base model)</td><td>27.3</td><td>38.1</td><td> $\mathbf { 3 . 3 \cdot 1 0 ^ { 1 8 } }$ </td><td></td></tr><tr><td>Transformer (big)</td><td>28.4</td><td>41.8</td><td> $2 . 3 \cdot 1 0 ^ { 1 9 }$ </td><td></td></tr></table>
 
-残差 Dropout 我们在每个子层的输出上应用 dropout[33]，然后将其添加到子层输入并进行归一化。此外，我们在编码器和解码器堆栈中对嵌入和位置编码的总和也应用 dropout。对于基础模型，我们使用的 dropout 率为 $P _ { d r o p } = 0 . 1$。
+| 模型 | BLEU（EN-DE） | BLEU（EN-FR） | 训练成本（FLOPs）EN-DE | 训练成本（FLOPs）EN-FR |
+| --- | ---: | ---: | ---: | ---: |
+| ByteNet [18] | 23.75 | — | — | — |
+| Deep-Att + PosUnk [39] | — | 39.2 | — | $1.0\cdot10^{20}$ |
+| GNMT + RL [38] | 24.6 | 39.92 | $2.3\cdot10^{19}$ | $1.4\cdot10^{20}$ |
+| ConvS2S [9] | 25.16 | 40.46 | $9.6\cdot10^{18}$ | $1.5\cdot10^{20}$ |
+| MoE [32] | 26.03 | 40.56 | $2.0\cdot10^{19}$ | $1.2\cdot10^{20}$ |
+| Deep-Att + PosUnk Ensemble [39] | — | 40.4 | — | $8.0\cdot10^{20}$ |
+| GNMT + RL Ensemble [38] | 26.30 | 41.16 | $1.8\cdot10^{20}$ | $1.1\cdot10^{21}$ |
+| ConvS2S Ensemble [9] | 26.36 | **41.29** | $7.7\cdot10^{19}$ | $1.2\cdot10^{21}$ |
+| Transformer（base model） | 27.3 | 38.1 | **$3.3\cdot10^{18}$** | **$3.3\cdot10^{18}$** |
+| Transformer（big） | **28.4** | **41.8** | $2.3\cdot10^{19}$ | $2.3\cdot10^{19}$ |
 
-标签平滑 在训练过程中，我们采用了值为 $\epsilon _ { l s } = 0 . 1 [ 3 6 ]$ 的标签平滑。这会降低困惑度，因为模型学会了更加不确定，但提高了准确率和 BLEU 分数。
+注：原表中 Transformer 两行的训练成本横跨 EN-DE 与 EN-FR 两列，因此这里在两列中显示同一个合并值。
+
+残差 Dropout 我们在每个子层的输出上应用 dropout[33]，然后将其添加到子层输入并进行归一化。此外，我们在编码器和解码器堆栈中对嵌入和位置编码的总和也应用 dropout。对于基础模型，我们使用的 dropout 率为 $P_{drop}=0.1$。
+
+标签平滑 在训练过程中，我们采用了值为 $\epsilon_{ls}=0.1$ 的标签平滑[36]。这会降低困惑度，因为模型学会了更加不确定，但提高了准确率和 BLEU 分数。
 
 ## 6 结果
 
@@ -172,33 +205,69 @@ $$
 
 在 WMT 2014 英德翻译任务上，大型 Transformer 模型（表 2 中的 Transformer (big)）比之前报告的最佳模型（包括集成模型）高出超过 2.0 BLEU，建立了 28.4 的新最优 BLEU 分数。该模型的配置列于表 3 的底行。训练在 8 块 P100 GPU 上耗时 3.5 天。即使是我们的基础模型也超越了所有先前发表的模型和集成模型，而训练成本仅为任何竞争模型的一小部分。
 
-在 WMT 2014 英法翻译任务上，我们的大型模型取得了 41.0 的 BLEU 分数，超越了所有先前发表的单一模型，训练成本不到先前最优模型的 1/4。用于英法翻译的 Transformer (big) 模型使用的 dropout 率为 $P _ { d r o p } = 0 . 1$，而不是 0.3。
+在 WMT 2014 英法翻译任务上，我们的大型模型取得了 41.0 的 BLEU 分数，超越了所有先前发表的单一模型，训练成本不到先前最优模型的 1/4。用于英法翻译的 Transformer (big) 模型使用的 dropout 率为 $P_{drop}=0.1$，而不是 0.3。
 
-对于基础模型，我们使用通过对最后 5 个检查点（每 10 分钟写入一次）进行平均得到的单一模型。对于大型模型，我们对最后 20 个检查点进行平均。我们使用束搜索，束大小为 4，长度惩罚 $\alpha = 0 . 6 [ 3 8 ]$。这些超参数是在开发集上实验后选择的。我们在推理时将最大输出长度设置为输入长度 + 50，但在可能时提前终止[38]。
+对于基础模型，我们使用通过对最后 5 个检查点（每 10 分钟写入一次）进行平均得到的单一模型。对于大型模型，我们对最后 20 个检查点进行平均。我们使用束搜索，束大小为 4，长度惩罚 $\alpha=0.6$[38]。这些超参数是在开发集上实验后选择的。我们在推理时将最大输出长度设置为输入长度 + 50，但在可能时提前终止[38]。
 
-表 2 总结了我们的结果，并将我们的翻译质量和训练成本与文献中的其他模型架构进行了比较。我们通过将训练时间、使用的 GPU 数量以及每个 GPU 的持续单精度浮点运算能力估计值相乘来估计训练模型所用的浮点运算次数 $\mathrm { G P U } ^ { 5 }$。
+表 2 总结了我们的结果，并将我们的翻译质量和训练成本与文献中的其他模型架构进行了比较。我们通过将训练时间、使用的 GPU 数量以及每个 GPU 的持续单精度浮点运算能力估计值相乘，估计训练模型所用的浮点运算次数（FLOPs）。
 
 ## 6.2 模型变体
 
 为了评估 Transformer 不同组件的重要性，我们以不同方式改变基础模型，在开发集 newstest2013 上测量英德翻译性能的变化。我们使用前一节所述的束搜索，但不进行检查点平均。我们在表 3 中展示了这些结果。
 
 表 3：Transformer 架构的变体。未列出的值与基础模型相同。所有指标均针对英德翻译开发集 newstest2013。列出的困惑度是基于字节对编码的逐词片困惑度，不应与逐词困惑度进行比较。
-<table><tr><td rowspan="2"></td><td rowspan="2"> $N$   $d _ { \mathrm { m o d e l } }$ </td><td rowspan="2"> $d _ { \mathrm { f f } }$ </td><td rowspan="2">h</td><td rowspan="2"> $d _ { k }$ </td><td rowspan="2"> $d _ { v }$ </td><td rowspan="2"> $P _ { d r o p }$ </td><td rowspan="2"> $\epsilon _ { l s }$ </td><td rowspan="2">train steps</td><td rowspan="2">PPL (dev)</td><td rowspan="2">BLEU (dev)</td><td rowspan="2">params  $\times 1 0 ^ { 6 }$ </td></tr><tr><td></td></tr><tr><td>base</td><td>6</td><td>512</td><td>2048</td><td>8</td><td>64</td><td>64</td><td>0.1 0.1</td><td>100K</td><td>4.92</td><td></td><td>25.8</td><td>65</td></tr><tr><td rowspan="3">(A)</td><td></td><td></td><td>1</td><td>512</td><td>512 128</td><td></td><td></td><td></td><td>5.29</td><td></td><td>24.9</td><td></td></tr><tr><td></td><td></td><td>4</td><td>128</td><td></td><td></td><td></td><td></td><td></td><td>5.00</td><td>25.5 25.8</td><td></td></tr><tr><td></td><td></td><td>16 32</td><td>32 16</td><td>32 16</td><td></td><td></td><td></td><td>4.91 5.01</td><td>25.4</td><td></td><td></td></tr><tr><td>(B)</td><td></td><td></td><td></td><td></td><td>16 32</td><td></td><td></td><td></td><td></td><td>5.16 5.01</td><td>25.1 25.4</td><td>58 60</td></tr><tr><td>(C)</td><td>2 4 8 256 1024</td><td>1024 4096</td><td></td><td>32 128</td><td>32 128</td><td></td><td></td><td></td><td></td><td>6.11 5.19 4.88 5.75 4.66 5.12</td><td>23.7 25.3 25.5 24.5 26.0 25.4</td><td>36 50 80 28 168 53</td></tr><tr><td>(D)</td><td></td><td></td><td></td><td></td><td></td><td></td><td>0.0 0.2 0.0</td><td></td><td></td><td>4.75 5.77 4.95</td><td>26.2 24.6 25.5 25.3</td><td>90</td></tr><tr><td>(E)</td><td></td><td>positional embedding instead of sinusoids</td><td></td><td></td><td></td><td></td><td></td><td>0.2</td><td></td><td>4.67 5.47</td><td>25.7 25.7</td><td></td></tr><tr><td>big</td><td>6</td><td>1024</td><td>4096 16</td><td></td><td></td><td></td><td>0.3</td><td></td><td>300K</td><td>4.92 4.33</td><td>26.4</td><td>213</td></tr></table>
+
+| 变体 | $N$ | $d_{model}$ | $d_{ff}$ | $h$ | $d_k$ | $d_v$ | $P_{drop}$ | $\epsilon_{ls}$ | 训练步数 | PPL（dev） | BLEU（dev） | 参数量（$\times10^6$） |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| base | 6 | 512 | 2048 | 8 | 64 | 64 | 0.1 | 0.1 | 100K | 4.92 | 25.8 | 65 |
+| (A) | — | — | — | 1 | 512 | 512 | — | — | — | 5.29 | 24.9 | — |
+| (A) | — | — | — | 4 | 128 | 128 | — | — | — | 5.00 | 25.5 | — |
+| (A) | — | — | — | 16 | 32 | 32 | — | — | — | 4.91 | 25.8 | — |
+| (A) | — | — | — | 32 | 16 | 16 | — | — | — | 5.01 | 25.4 | — |
+| (B) | — | — | — | — | 16 | — | — | — | — | 5.16 | 25.1 | 58 |
+| (B) | — | — | — | — | 32 | — | — | — | — | 5.01 | 25.4 | 60 |
+| (C) | 2 | — | — | — | — | — | — | — | — | 6.11 | 23.7 | 36 |
+| (C) | 4 | — | — | — | — | — | — | — | — | 5.19 | 25.3 | 50 |
+| (C) | 8 | — | — | — | — | — | — | — | — | 4.88 | 25.5 | 80 |
+| (C) | — | 256 | — | — | 32 | 32 | — | — | — | 5.75 | 24.5 | 28 |
+| (C) | — | 1024 | — | — | 128 | 128 | — | — | — | 4.66 | 26.0 | 168 |
+| (C) | — | — | 1024 | — | — | — | — | — | — | 5.12 | 25.4 | 53 |
+| (C) | — | — | 4096 | — | — | — | — | — | — | 4.75 | 26.2 | 90 |
+| (D) | — | — | — | — | — | — | 0.0 | — | — | 5.77 | 24.6 | — |
+| (D) | — | — | — | — | — | — | 0.2 | — | — | 4.95 | 25.5 | — |
+| (D) | — | — | — | — | — | — | — | 0.0 | — | 4.67 | 25.3 | — |
+| (D) | — | — | — | — | — | — | — | 0.2 | — | 5.47 | 25.7 | — |
+| (E) | — | 使用可学习的位置嵌入代替正弦位置编码 | — | — | — | — | — | — | — | 4.92 | 25.7 | — |
+| big | 6 | 1024 | 4096 | 16 | — | — | 0.3 | — | 300K | **4.33** | **26.4** | 213 |
 
 在表 3 行 (A) 中，我们改变注意力头的数量以及注意力键和值的维度，同时保持计算量恒定，如第 3.2.2 节所述。虽然单头注意力比最佳设置差 0.9 BLEU，但头数过多时质量也会下降。
 
-在表 3 行 (B) 中，我们观察到减小注意力键大小 $d _ { k }$ 会损害模型质量。这表明确定兼容性并不容易，并且比点积更复杂的兼容性函数可能是有益的。我们进一步在行 (C) 和 (D) 中观察到，正如预期，更大的模型更好，并且 dropout 对于避免过拟合非常有帮助。在行 (E) 中，我们将正弦位置编码替换为可学习的位置嵌入[9]，并观察到与基础模型几乎相同的结果。
+在表 3 行 (B) 中，我们观察到减小注意力键大小 $d_k$ 会损害模型质量。这表明确定兼容性并不容易，并且比点积更复杂的兼容性函数可能是有益的。我们进一步在行 (C) 和 (D) 中观察到，正如预期，更大的模型更好，并且 dropout 对于避免过拟合非常有帮助。在行 (E) 中，我们将正弦位置编码替换为可学习的位置嵌入[9]，并观察到与基础模型几乎相同的结果。
 
 ## 6.3 英语成分句法分析
 
 为了评估 Transformer 是否可以泛化到其他任务，我们在英语成分句法分析上进行了实验。该任务提出了特定的挑战：输出受到强结构约束，并且比输入长得多。此外，RNN 序列到序列模型在数据量小的场景下未能取得最优结果[37]。
 
-我们在 Penn Treebank [25] 的华尔街日报 (WSJ) 部分（约 40K 训练句子）上训练了一个 4 层 Transformer，$d _ { m o d e l } = 1 0 2 4$。我们还在半监督设置下进行训练，使用了来自 [37] 的更大的高置信度和 BerkleyParser 语料库，包含约 1700 万个句子。对于仅 WSJ 设置，我们使用 16K 词元的词汇表；对于半监督设置，使用 32K 词元的词汇表。
+我们在 Penn Treebank [25] 的华尔街日报 (WSJ) 部分（约 40K 训练句子）上训练了一个 4 层 Transformer，$d_{model}=1024$。我们还在半监督设置下进行训练，使用了来自 [37] 的更大的高置信度和 BerkleyParser 语料库，包含约 1700 万个句子。对于仅 WSJ 设置，我们使用 16K 词元的词汇表；对于半监督设置，使用 32K 词元的词汇表。
 
 我们仅进行了少量实验来选择第 22 节开发集上的 dropout（包括注意力和残差，第 5.4 节）、学习率和束大小，所有其他参数与英德基础翻译模型保持不变。在推理期间，我们将最大输出长度增加到输入长度 + 300。对于仅 WSJ 和半监督设置，我们均使用束大小 21 和 α = 0.3。
 
 表 4：Transformer 能很好地泛化到英语成分句法分析（结果基于 WSJ 第 23 节）
-<table><tr><td>Parser</td><td>Training</td><td>WSJ 23 F1</td></tr><tr><td>Vinyals &amp; Kaiser el al. (2014) [37] Petrov et al. (2006) [29]</td><td>WSJ only, discriminative WSJ only, discriminative</td><td>88.3 90.4</td></tr><tr><td>Zhu et al. (2013) [40]</td><td>WSJ only, discriminative</td><td>90.4</td></tr><tr><td>Dyer et al. (2016) [8]</td><td>WSJ only, discriminative</td><td>91.7</td></tr><tr><td>Transformer (4 layers)</td><td>WSJ only, discriminative</td><td>91.3</td></tr><tr><td>Zhu et al. (2013) [40]</td><td>semi-supervised</td><td>91.3</td></tr><tr><td>Huang &amp; Harper (2009) [14]</td><td>semi-supervised</td><td>91.3</td></tr><tr><td>McClosky et al. (2006) [26]</td><td>semi-supervised</td><td>92.1</td></tr><tr><td>Vinyals &amp; Kaiser el al. (2014) [37]</td><td>semi-supervised</td><td></td></tr><tr><td>Transformer (4 layers)</td><td>semi-supervised</td><td>92.1</td></tr><tr><td>Luong et al. (2015) [23]</td><td>multi-task</td><td>92.7</td></tr><tr><td>Dyer et al. (2016) [8]</td><td>generative</td><td>93.0</td></tr><tr><td></td><td></td><td>93.3</td></tr></table>]
+
+| 解析器 | 训练方式 | WSJ 23 F1 |
+| --- | --- | ---: |
+| Vinyals & Kaiser et al. (2014) [37] | 仅 WSJ，判别式 | 88.3 |
+| Petrov et al. (2006) [29] | 仅 WSJ，判别式 | 90.4 |
+| Zhu et al. (2013) [40] | 仅 WSJ，判别式 | 90.4 |
+| Dyer et al. (2016) [8] | 仅 WSJ，判别式 | 91.7 |
+| Transformer（4 层） | 仅 WSJ，判别式 | 91.3 |
+| Zhu et al. (2013) [40] | 半监督 | 91.3 |
+| Huang & Harper (2009) [14] | 半监督 | 91.3 |
+| McClosky et al. (2006) [26] | 半监督 | 92.1 |
+| Vinyals & Kaiser et al. (2014) [37] | 半监督 | 92.1 |
+| Transformer（4 层） | 半监督 | 92.7 |
+| Luong et al. (2015) [23] | 多任务 | 93.0 |
+| Dyer et al. (2016) [8] | 生成式 | 93.3 |
 
 我们在表 4 中的结果表明，尽管缺乏任务特定的调优，我们的模型表现惊人地好，除了循环神经网络语法[8]之外，优于所有先前报告的模型。
 
