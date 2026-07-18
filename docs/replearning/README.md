@@ -1,5 +1,5 @@
 ---
-title: 表征学习路线
+title: 学习路线
 icon: brain
 index: false
 dir:
