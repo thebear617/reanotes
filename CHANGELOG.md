@@ -1,5 +1,39 @@
 # 更新记录
 
+## v0.4.2 - 2026-07-19
+
+本版本将论文翻译流程从一次性脚本升级为仓库内可追踪、可测试、可直接发布到 ReaNotes 文献库的完整 Skill，同时修复译文中的公式、表格和图片浏览问题。
+
+### 论文翻译 Skill
+
+- 将 `paper-translate` 迁入 `.agents/skills/paper-translate/`，纳入 ReaNotes Git 版本管理。
+- 建立 MinerU 解析、DeepSeek 翻译、结构后处理、质量检查和 ReaNotes 发布的一体化命令。
+- 保留公式、图片和 HTML 表格占位符，并对 API 截断、占位符丢失和异常响应进行重试与阻断。
+- 将可转换的 HTML 表格展开为 Markdown 表格，支持 `rowspan`、`colspan` 和多级表头。
+- 自动整理图片替代文本与图注，检查本地图片缺失，并检测高置信度的 OCR 公式异常。
+- 根据真实论文验收结果修复无摘要论文的正文起点、多面板共享图注、VuePress 图片路径、重复 MinerU 抽取和公式字体加载失败，并切换为可稳定静态构建的 KaTeX 渲染。
+- 使用 `publishable`、`needs_review` 和 `blocked` 三种状态形成发布质量闸门。
+
+### 文献库发布
+
+- 新增 ReaNotes 发布适配器，只把中文正文、图片、质量报告和来源元数据写入公开文献库。
+- 自动更新 `docs/literature/papers.md`；已有论文原位切换为本地译文链接，新论文生成可继续编辑的索引记录。
+- 发布后自动运行 Prettier、Markdownlint 和 VuePress build，并检查生成页面中的已知 MathJax 与占位符异常。
+- 增加独立发布入口，可将已有译文写入文献库而不重复调用 MinerU 或 DeepSeek API。
+
+### 渲染与验证
+
+- 修复《Attention Is All You Need》译文中的 OCR 公式、数学表格和 MathJax 兼容问题。
+- 调整论文图片在桌面端与移动端的浏览尺寸。
+- 使用完整流水线翻译并收录《A Cookbook of Self-Supervised Learning》中文全文。
+- 新增 27 项单元与回归测试，覆盖公式保护、API 完整性、表格转换、图片处理、质量报告和发布流程。
+- 补充面向使用者的 README、Skill 说明和迁移文档，并确保真实 `.env` 与 Python 缓存不会进入版本库。
+
+### 版本节点
+
+- v0.4.1 标签：`97c19c3`
+- v0.4.2：论文翻译与发布工作流完成仓库化
+
 ## v0.4.1 - 2026-07-18
 
 本版本汇总提交 `709d188`（v0.4.0）之后至 `35c314e` 的 29 次提交。核心变化是将站点从旧版数据驱动静态页面迁移为以 Markdown 为唯一内容源的 VuePress 知识库，并重新收敛表征学习的内容结构。

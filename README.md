@@ -4,7 +4,7 @@
 
 - 主站：[rea.thebear617.cn](https://rea.thebear617.cn/)
 - GitHub Pages：[thebear617.github.io/reanotes](https://thebear617.github.io/reanotes/)
-- 当前版本：`v0.4.1`（[更新记录](CHANGELOG.md)）
+- 当前版本：`v0.4.2`（[更新记录](CHANGELOG.md)）
 
 ## 技术架构
 

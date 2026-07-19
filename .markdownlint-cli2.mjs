@@ -15,6 +15,8 @@ export default {
   ignores: [
     "**/node_modules/**",
     "**/*.snippet.md",
+    ".agents/skills/**",
     "docs/literature/translations/**",
+    "output/**",
   ],
 };

@@ -20,7 +20,7 @@ export const theme = hopeTheme({
     gfm: true,
     linksCheck: true,
     math: {
-      type: "mathjax",
+      type: "katex",
     },
     mermaid: true,
     tasklist: true,

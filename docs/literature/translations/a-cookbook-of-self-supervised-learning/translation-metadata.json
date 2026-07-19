@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "title": "A Cookbook of Self-Supervised Learning",
+  "zh_title": "自监督学习指南",
+  "source_input": "https://arxiv.org/abs/2304.12210",
+  "quality_status": "publishable",
+  "published_at": "2026-07-19T10:37:18.294896+00:00",
+  "translation_model": "deepseek-chat",
+  "translation_report": "translation-report.json"
+}

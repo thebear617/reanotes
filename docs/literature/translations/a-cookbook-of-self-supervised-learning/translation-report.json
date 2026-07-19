@@ -1,0 +1,291 @@
+{
+  "schema_version": 2,
+  "status": "publishable",
+  "source": "/Users/mokaiche/Documents/htmls/reanotes/output/translations/2026-07-19/a-cookbook-of-self-supervised-learning/full.md",
+  "output": "/Users/mokaiche/Documents/htmls/reanotes/output/translations/2026-07-19/a-cookbook-of-self-supervised-learning/full_zh.md",
+  "output_written": true,
+  "checks": {
+    "placeholder_integrity": {
+      "status": "passed",
+      "protected": {
+        "html_tables": 0,
+        "images": 16,
+        "math": 102
+      },
+      "missing": [],
+      "unexpected": [],
+      "remaining": []
+    },
+    "api_completion": {
+      "status": "passed",
+      "chunks": [
+        {
+          "index": 1,
+          "finish_reason": "stop",
+          "attempts": 1,
+          "placeholders": 0
+        },
+        {
+          "index": 2,
+          "finish_reason": "stop",
+          "attempts": 1,
+          "placeholders": 62
+        },
+        {
+          "index": 3,
+          "finish_reason": "stop",
+          "attempts": 1,
+          "placeholders": 28
+        },
+        {
+          "index": 4,
+          "finish_reason": "stop",
+          "attempts": 1,
+          "placeholders": 11
+        },
+        {
+          "index": 5,
+          "finish_reason": "stop",
+          "attempts": 1,
+          "placeholders": 15
+        },
+        {
+          "index": 6,
+          "finish_reason": "stop",
+          "attempts": 1,
+          "placeholders": 2
+        },
+        {
+          "index": 7,
+          "finish_reason": "stop",
+          "attempts": 1,
+          "placeholders": 0
+        }
+      ]
+    },
+    "math_protection": {
+      "status": "passed",
+      "protected": 102
+    },
+    "table_normalization": {
+      "source_html": 3,
+      "converted": 3,
+      "fallback_html": 0,
+      "issues": []
+    },
+    "markdown_tables": {
+      "count": 3,
+      "issues": [],
+      "expected_from_html": 3,
+      "missing_converted": 0
+    },
+    "image_normalization": {
+      "referenced": 16,
+      "generated_alt": 16,
+      "fallback_alt": 0,
+      "captions_normalized": 9,
+      "missing": []
+    },
+    "math_ocr": {
+      "count": 102,
+      "issues": [],
+      "normalization": {
+        "count": 32,
+        "fixes": [
+          {
+            "formula": 16,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { B Y O L }",
+            "after": "\\mathrm{BYOL}"
+          },
+          {
+            "formula": 16,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { r e n o r m }",
+            "after": "\\mathrm{renorm}"
+          },
+          {
+            "formula": 16,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { r e n o r m }",
+            "after": "\\mathrm{renorm}"
+          },
+          {
+            "formula": 18,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { r e n o r m }",
+            "after": "\\mathrm{renorm}"
+          },
+          {
+            "formula": 18,
+            "type": "spaced_command_identifier",
+            "before": "\\operatorname* { m a x }",
+            "after": "\\operatorname*{max}"
+          },
+          {
+            "formula": 24,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { c o n t }",
+            "after": "\\mathrm{cont}"
+          },
+          {
+            "formula": 24,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { R e L U }",
+            "after": "\\mathrm{ReLU}"
+          },
+          {
+            "formula": 25,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { N C A }",
+            "after": "\\mathrm{NCA}"
+          },
+          {
+            "formula": 26,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { t r i p l e t }",
+            "after": "\\mathrm{triplet}"
+          },
+          {
+            "formula": 26,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { R e L U }",
+            "after": "\\mathrm{ReLU}"
+          },
+          {
+            "formula": 27,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { t u p l e }",
+            "after": "\\mathrm{tuple}"
+          },
+          {
+            "formula": 29,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { N C E }",
+            "after": "\\mathrm{NCE}"
+          },
+          {
+            "formula": 29,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { C o S i m }",
+            "after": "\\mathrm{CoSim}"
+          },
+          {
+            "formula": 29,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { C o S i m }",
+            "after": "\\mathrm{CoSim}"
+          },
+          {
+            "formula": 30,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { i n f o N C E }",
+            "after": "\\mathrm{infoNCE}"
+          },
+          {
+            "formula": 30,
+            "type": "spaced_command_identifier",
+            "before": "\\operatorname { C o S i m }",
+            "after": "\\operatorname{CoSim}"
+          },
+          {
+            "formula": 30,
+            "type": "spaced_command_identifier",
+            "before": "\\operatorname { C o S i m }",
+            "after": "\\operatorname{CoSim}"
+          },
+          {
+            "formula": 38,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { S i m S I A M }",
+            "after": "\\mathrm{SimSIAM}"
+          },
+          {
+            "formula": 38,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { r e n o r m }",
+            "after": "\\mathrm{renorm}"
+          },
+          {
+            "formula": 38,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { r e n o r m }",
+            "after": "\\mathrm{renorm}"
+          },
+          {
+            "formula": 43,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { D I N O }",
+            "after": "\\mathrm{DINO}"
+          },
+          {
+            "formula": 43,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { C r o s s E n t }",
+            "after": "\\mathrm{CrossEnt}"
+          },
+          {
+            "formula": 43,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { s o f t m a x }",
+            "after": "\\mathrm{softmax}"
+          },
+          {
+            "formula": 43,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { s o f t m a x }",
+            "after": "\\mathrm{softmax}"
+          },
+          {
+            "formula": 43,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { c e n t e r }",
+            "after": "\\mathrm{center}"
+          },
+          {
+            "formula": 53,
+            "type": "spaced_command_identifier",
+            "before": "\\operatorname* { m i n }",
+            "after": "\\operatorname*{min}"
+          },
+          {
+            "formula": 60,
+            "type": "spaced_command_identifier",
+            "before": "\\operatorname * { a r g m a x }",
+            "after": "\\operatorname*{argmax}"
+          },
+          {
+            "formula": 60,
+            "type": "spaced_command_identifier",
+            "before": "\\operatorname { c o r r }",
+            "after": "\\operatorname{corr}"
+          },
+          {
+            "formula": 64,
+            "type": "spaced_command_identifier",
+            "before": "\\operatorname* { m i n }",
+            "after": "\\operatorname*{min}"
+          },
+          {
+            "formula": 81,
+            "type": "spaced_command_identifier",
+            "before": "\\operatorname* { m a x }",
+            "after": "\\operatorname*{max}"
+          },
+          {
+            "formula": 101,
+            "type": "spaced_command_identifier",
+            "before": "\\mathrm { R a n k M e }",
+            "after": "\\mathrm{RankMe}"
+          },
+          {
+            "formula": 101,
+            "type": "spaced_command_identifier",
+            "before": "\\operatorname* { m i n }",
+            "after": "\\operatorname*{min}"
+          }
+        ]
+      }
+    }
+  }
+}
